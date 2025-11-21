@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificar Código | SecureAuth</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="email_verification.css">
+</head>
+<body>
+    <div class="verification-container">
+        <div class="verification-card">
+            <div class="verification-header">
+                <h1><i class="fas fa-shield-alt"></i> Verificar Código</h1>
+                <p>Ingresa el código de 6 dígitos que enviamos a tu email</p>
+                <div id="userEmail" class="user-email"></div>
+            </div>
+            
+            <form id="verificationForm" class="verification-form">
+                <div class="otp-container">
+                    <input type="text" id="digit1" class="otp-digit" maxlength="1" required>
+                    <input type="text" id="digit2" class="otp-digit" maxlength="1" required>
+                    <input type="text" id="digit3" class="otp-digit" maxlength="1" required>
+                    <input type="text" id="digit4" class="otp-digit" maxlength="1" required>
+                    <input type="text" id="digit5" class="otp-digit" maxlength="1" required>
+                    <input type="text" id="digit6" class="otp-digit" maxlength="1" required>
+                </div>
+                
+                <div class="timer-container">
+                    <div id="timer" class="timer">02:00</div>
+                </div>
+                
+                <button type="submit" class="verify-btn" id="verifyBtn">
+                    <i class="fas fa-check-circle"></i> Verificar Código
+                </button>
+                
+                <div class="resend-container">
+                    <p>¿No recibiste el código?</p>
+                    <button type="button" id="resendBtn" class="resend-btn" disabled>
+                        Reenviar código <span id="resendTimer">(120)</span>
+                    </button>
+                </div>
+            </form>
+            
+            <div id="verificationMessage" class="verification-message" style="display: none;"></div>
+            
+            <!--
+                        <div class="back-link">
+                            <a href="../email.html">
+                                <i class="fas fa-arrow-left"></i> Cambiar email
+                            </a>
+                        </div>
+            -->
+        </div>
+    </div>
+
+    <script src="email_verification.js"></script>
+</body>
+</html>

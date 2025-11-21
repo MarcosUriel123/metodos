@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro Seguro | Crear Cuenta</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="singin.css">
+</head>
+<body>
+  <div class="register-container">
+    <div class="register-card">
+      
+      <!-- Header -->
+      <div class="register-header">
+        <h1 class="register-title">Crear Cuenta</h1>
+        <p class="register-subtitle">
+          ¿Ya tienes cuenta? 
+          <a href="../log_in/login.html">Iniciar sesión</a>
+        </p>
+      </div>
+
+      <!-- Formulario -->
+      <form id="registerForm" class="register-form">
+        
+        <!-- Nombre y Apellido -->
+        <div class="form-row">
+          <div class="form-group">
+            <input 
+              type="text" 
+              class="form-input" 
+              id="first_name" 
+              placeholder=" "
+              required
+              maxlength="45"
+              pattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]{1,45}$"
+              title="Solo letras, máximo 45 caracteres"
+            />
+            <label for="first_name" class="floating-label">
+              <i class="fas fa-user"></i> Nombre
+            </label>
+          </div>
+          
+          <div class="form-group">
+            <input 
+              type="text" 
+              class="form-input" 
+              id="last_name" 
+              placeholder=" "
+              required
+              maxlength="45"
+              pattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]{1,45}$"
+              title="Solo letras, máximo 45 caracteres"
+            />
+            <label for="last_name" class="floating-label">
+              <i class="fas fa-user"></i> Apellido
+            </label>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <input 
+            type="email" 
+            class="form-input" 
+            id="your_email" 
+            placeholder=" "
+            required 
+            pattern="[^@]+@[^@]+\.[a-zA-Z]{2,6}"
+          />
+          <label for="your_email" class="floating-label">
+            <i class="fas fa-envelope"></i> Correo electrónico
+          </label>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="form-group">
+          <div class="input-group">
+            <input 
+              type="password" 
+              class="form-input" 
+              id="password" 
+              placeholder=" "
+              required 
+              minlength="10"
+              maxlength="10"
+              pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{10}$"
+              title="Exactamente 10 caracteres: debe incluir al menos una mayúscula, una minúscula y un número"
+            />
+            <label for="password" class="floating-label">
+              <i class="fas fa-lock"></i> Contraseña (10 caracteres)
+            </label>
+            <button type="button" class="password-toggle" id="togglePassword">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+          <div class="password-hint">10 caracteres: 1 mayúscula, 1 minúscula y 1 número</div>
+        </div>
+
+        <!-- Confirmar Contraseña -->
+        <div class="form-group">
+          <div class="input-group">
+            <input 
+              type="password" 
+              class="form-input" 
+              id="confirmPassword" 
+              placeholder=" "
+              required 
+              minlength="10"
+              maxlength="10"
+            />
+            <label for="confirmPassword" class="floating-label">
+              <i class="fas fa-lock"></i> Confirmar Contraseña
+            </label>
+            <button type="button" class="password-toggle" id="toggleConfirmPassword">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Métodos de Autenticación -->
+        <div class="auth-methods">
+          <div class="auth-methods-title">
+            <i class="fas fa-shield-alt"></i>
+            Método de Verificación
+          </div>
+          
+          <label class="method-option selected" for="authMethodQR">
+            <input 
+              class="method-radio" 
+              type="radio" 
+              name="authMethod" 
+              id="authMethodQR" 
+              value="totp" 
+              checked 
+            />
+            <div class="method-radio-custom"></div>
+            <div class="method-content">
+              <div class="method-label">Código QR</div>
+              <div class="method-description">Google Authenticator - Más seguro</div>
+            </div>
+            <i class="fas fa-qrcode method-icon"></i>
+          </label>
+          
+          <label class="method-option" for="authMethodSMS">
+            <input 
+              class="method-radio" 
+              type="radio" 
+              name="authMethod" 
+              id="authMethodSMS" 
+              value="sms" 
+            />
+            <div class="method-radio-custom"></div>
+            <div class="method-content">
+              <div class="method-label">Código SMS</div>
+              <div class="method-description">Mensaje de texto - Más conveniente</div>
+            </div>
+            <i class="fas fa-mobile-alt method-icon"></i>
+          </label>
+
+          <label class="method-option" for="authMethodEmail">
+            <input 
+              class="method-radio" 
+              type="radio" 
+              name="authMethod" 
+              id="authMethodEmail" 
+              value="email" 
+            />
+            <div class="method-radio-custom"></div>
+            <div class="method-content">
+              <div class="method-label">Código Email</div>
+              <div class="method-description">Correo electrónico - Fácil acceso</div>
+            </div>
+            <i class="fas fa-envelope method-icon"></i>
+          </label>
+        </div>
+
+        <!-- Campo Teléfono (solo para SMS) -->
+        <div class="form-group phone-field" id="phoneNumberField" style="display: none;">
+            <input 
+                type="tel" 
+                class="form-input" 
+                id="phone_number" 
+                placeholder=" "
+                pattern="^[0-9]{10}$|^(\+52)[0-9]{10}$"
+                maxlength="13"
+                title="Solo números: 10 dígitos (ej: 5512345678) o +52 seguido de 10 dígitos"
+            />
+            <label for="phone_number" class="floating-label">
+                <i class="fas fa-phone"></i> Número de teléfono
+            </label>
+            <div class="phone-hint">Solo números: 10 dígitos (ej: 5512345678) o +521234567890</div>
+        </div>
+
+        <!-- Botón de Registro -->
+        <button type="button" id="registerBtn" class="register-btn">
+          <i class="fas fa-user-plus"></i> Crear Cuenta
+        </button>
+
+        <!-- Mensajes del sistema -->
+        <div id="registerMessage" class="register-message" style="display: none;"></div>
+
+      </form>
+    </div>
+  </div>
+
+  <script src="singin.js"></script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.verification-container {
+    width: 100%;
+    max-width: 400px;
+}
+
+.verification-card {
+    background: white;
+    padding: 40px 30px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.verification-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.verification-header h1 {
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.verification-header h1 i {
+    color: #2563eb;
+}
+
+.verification-header p {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.user-email {
+    color: #2563eb;
+    font-weight: 600;
+    font-size: 16px;
+    background: #dbeafe;
+    padding: 8px 16px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.verification-form {
+    margin-bottom: 20px;
+}
+
+.otp-container {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.otp-digit {
+    width: 50px;
+    height: 60px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    background: #f9fafb;
+    transition: all 0.3s ease;
+}
+
+.otp-digit:focus {
+    outline: none;
+    border-color: #2563eb;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    transform: translateY(-2px);
+}
+
+.otp-digit.filled {
+    border-color: #10b981;
+    background: #ecfdf5;
+}
+
+.timer-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.timer {
+    font-size: 18px;
+    font-weight: 600;
+    color: #dc2626;
+    background: #fef2f2;
+    padding: 8px 16px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.timer.warning {
+    color: #ea580c;
+    background: #fff7ed;
+}
+
+.verify-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.verify-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+}
+
+.verify-btn:active {
+    transform: translateY(0);
+}
+
+.verify-btn.loading {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.resend-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.resend-container p {
+    color: #6b7280;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.resend-btn {
+    background: none;
+    border: 2px solid #2563eb;
+    color: #2563eb;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.resend-btn:hover:not(:disabled) {
+    background: #2563eb;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.resend-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: #9ca3af;
+    color: #9ca3af;
+}
+
+.verification-message {
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.message-success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.message-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.message-info {
+    background: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #93c5fd;
+}
+
+.back-link {
+    text-align: center;
+}
+
+.back-link a {
+    color: #6b7280;
+    text-decoration: none;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: color 0.3s ease;
+}
+
+.back-link a:hover {
+    color: #2563eb;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .verification-card {
+        padding: 30px 20px;
+    }
+    
+    .verification-header h1 {
+        font-size: 20px;
+    }
+    
+    .otp-digit {
+        width: 45px;
+        height: 55px;
+        font-size: 20px;
+    }
+}

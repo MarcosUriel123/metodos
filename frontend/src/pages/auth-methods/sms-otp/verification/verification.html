@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación SMS | SecureAuth</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="verification.css">
+</head>
+<body>
+    <div class="verification-container">
+        <div class="verification-card">
+            
+            <!-- Header -->
+            <div class="verification-header">
+                <div class="verification-icon">
+                    <i class="fas fa-sms"></i>
+                </div>
+                <h1 class="verification-title">Verificación SMS</h1>
+                <p class="verification-subtitle">
+                    Ingresa el código de 6 dígitos enviado a tu teléfono
+                </p>
+            </div>
+
+            <!-- Formulario -->
+            <div class="verification-form">
+                <!-- Input OTP -->
+                <div class="otp-input-group">
+                    <label for="otp" class="otp-label">
+                        <i class="fas fa-mobile-alt"></i> Código de verificación
+                    </label>
+                    <input 
+                        type="text" 
+                        id="otp" 
+                        maxlength="6" 
+                        placeholder="000000" 
+                        required
+                        class="otp-input"
+                    >
+                    <div class="otp-hint">Ingresa los 6 dígitos del código SMS</div>
+                </div>
+
+                <!-- Botón principal -->
+                <button id="verifyOTP" class="verify-btn">
+                    <i class="fas fa-check-circle"></i> Verificar Código
+                </button>
+
+                <!-- Mensajes del sistema -->
+                <div id="message" class="message-container"></div>
+
+                <!-- Reenviar código -->
+                <div class="resend-section">
+                    <p>¿No recibiste el código?</p>
+                    <button id="resendOTP" class="resend-btn">
+                        <i class="fas fa-redo"></i> Reenviar código SMS
+                    </button>
+                    <div class="resend-timer" id="resendTimer" style="display: none;">
+                        Podrás reenviar en <span id="countdown">60</span> segundos
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="verification-footer">
+                <a href="../log_in/login.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Volver al login
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="verification.js"></script>
+</body>
+</html>

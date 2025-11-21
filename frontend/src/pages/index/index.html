@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Bienvenida</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="index.css">   
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="main-nav">
+        <div class="nav-content">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <span>SecureAuth</span>
+            </div>
+            <button class="logout-btn" onclick="cerrarSesion()">
+                <i class="fas fa-sign-out-alt"></i>
+                Cerrar sesión
+            </button>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="welcome-container">
+        <div class="welcome-card">
+            <!-- Header -->
+            <div class="welcome-header">
+                <div class="welcome-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h1 id="welcome-text" class="welcome-title">¡Bienvenido!</h1>
+                <p class="welcome-subtitle">Autenticación exitosa</p>
+            </div>
+
+            <!-- Mensaje de bienvenida -->
+            <div class="welcome-content">
+                <p class="welcome-message">
+                    Gracias por iniciar sesión de manera segura. Esperamos que disfrutes tu experiencia 
+                    en nuestra plataforma protegida con autenticación de dos factores.
+                </p>
+                
+                <!-- Estadísticas de seguridad -->
+                <div class="security-stats">
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value">Protegido</span>
+                            <span class="stat-label">Autenticación 2FA</span>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="login-time">Ahora</span>
+                            <span class="stat-label">Último acceso</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Efectos de fondo -->
+    <div class="background-effects">
+        <div class="floating-circle circle-1"></div>
+        <div class="floating-circle circle-2"></div>
+        <div class="floating-circle circle-3"></div>
+    </div>
+
+    <script src="index.js"></script>  
+</body>
+</html>

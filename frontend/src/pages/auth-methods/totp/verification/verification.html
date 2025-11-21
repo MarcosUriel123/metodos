@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación en dos pasos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="verification.css">
+</head>
+<body>
+    <div class="verification-container">
+        <div class="verification-card">
+            
+            <!-- Header -->
+            <div class="verification-header">
+                <div class="verification-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h1 class="verification-title">Verificación en dos pasos</h1>
+                <p class="verification-subtitle">
+                    Para mayor seguridad, ingresa la contraseña temporal (OTP) generada por tu Aplicación de autenticación.
+                </p>
+            </div>
+
+            <!-- Formulario -->
+            <form class="rounded bg-white shadow verification-form">
+                <div class="otp_input text-start mb-2">
+                    <label for="digit">Ingresar código:</label>
+                    <div class="d-flex align-items-center justify-content-between mt-2">
+                        <input type="text" class="form-control">
+                        <input type="text" class="form-control">
+                        <input type="text" class="form-control">
+                        <input type="text" class="form-control">
+                        <input type="text" class="form-control">
+                        <input type="text" class="form-control">
+                    </div> 
+                </div>
+
+                <button action="POST" type="button" class="btn btn-primary submit_btn my-4 verify-btn">Verificar</button> 
+            </form>
+
+        </div>
+    </div>
+
+    <script src="verification.js"></script>
+</body>
+</html>
