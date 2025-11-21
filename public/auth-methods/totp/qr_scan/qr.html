@@ -1,62 +1,62 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso con SMS | SecureAuth</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/public/auth-methods/sms-otp/sms.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configuración TOTP | Escanear QR</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="/auth-methods/totp/qr_scan/qr.css">
 </head>
 <body>
-    <section class="py-3 py-md-5 py-xl-8">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="mb-5 text-center">
-                        <div class="sms-icon mb-3">
-                            <i class="fas fa-mobile-alt fa-3x text-primary"></i>
-                        </div>
-                        <h2 class="display-5 fw-bold">Acceso con SMS</h2>
-                        <p class="lead">
-                            <i class="fas fa-sms text-primary"></i>
-                            ¿Prefieres otro método? 
-                            <!-- ✅ CORREGIDO - Ruta absoluta -->
-                            <a href="/public/access/log_in/login.html">Volver al inicio de sesión</a>
-                        </p>
-                    </div>
-                    <div class="row justify-content-center">
-                        <div class="col-12 col-lg-5">
-                            <form id="smsForm">
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" id="username" placeholder="Usuario" required />
-                                    <label for="username">
-                                        <i class="fas fa-user me-2"></i>Nombre de Usuario
-                                    </label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="tel" class="form-control" id="phone" placeholder="+52 1234567890" required />
-                                    <label for="phone">
-                                        <i class="fas fa-phone me-2"></i>Número de teléfono
-                                    </label>
-                                </div>
-                                <div class="d-grid gap-2">
-                                    <button type="submit" class="btn btn-primary btn-lg" id="sendOTP">
-                                        <i class="fas fa-paper-plane me-2"></i>
-                                        <span class="button-text">Enviar código SMS</span>
-                                        <div class="spinner-border spinner-border-sm d-none" role="status">
-                                            <span class="visually-hidden">Enviando...</span>
-                                        </div>
-                                    </button>
-                                </div>
-                            </form>
-                            <div id="message" class="mt-3 alert" style="display: none;"></div>
-                        </div>
-                    </div>
-                </div>
+  <div class="qr-container">
+    <div class="qr-card">
+      
+      <!-- Header -->
+      <div class="qr-header">
+        <h1 class="qr-title">
+          <i class="fas fa-qrcode"></i> Configurar Autenticación
+        </h1>
+        <p class="qr-subtitle">Escanea el código QR con tu aplicación de autenticación</p>
+      </div>
+
+      <!-- Contenedor QR -->
+      <div class="qr-code-container">
+        <div id="qrContainer" class="qr-image-wrapper"></div>
+        <div class="qr-instructions">
+          <div class="instruction-step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <strong>Abre</strong> tu aplicación de autenticación (Google Authenticator, Authy, etc.)
             </div>
+          </div>
+          <div class="instruction-step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <strong>Escanea</strong> este código QR o ingresa manualmente la clave secreta
+            </div>
+          </div>
+          <div class="instruction-step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <strong>Verifica</strong> el código OTP generado por la aplicación
+            </div>
+          </div>
         </div>
-    </section>
-    <script src="/public/auth-methods/sms-otp/sms.js"></script>
+      </div>
+
+      <!-- Botón de acción -->
+      <div class="qr-actions">
+        <button id="scannedBtn" class="verify-btn">
+          <i class="fas fa-check-circle"></i> Ya escaneé, verificar OTP
+        </button>
+      </div>
+
+      <!-- Mensajes del sistema -->
+      <div id="qrMessage" class="qr-message" style="display: none;"></div>
+
+    </div>
+  </div>
+
+<script src="/auth-methods/totp/qr_scan/qr.js"></script>
 </body>
 </html>

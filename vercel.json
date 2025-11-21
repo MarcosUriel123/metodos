@@ -2,58 +2,9 @@
   "version": 2,
   "builds": [
     {
-      "src": "public/**/*.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "public/**/*.css", 
-      "use": "@vercel/static"
-    },
-    {
-      "src": "public/**/*.js",
+      "src": "public/**/*",
       "use": "@vercel/static"
     }
   ],
-  "routes": [
-    {
-      "src": "/",
-      "dest": "/public/index/index.html"
-    },
-    {
-      "src": "/login",
-      "dest": "/public/access/log_in/login.html"
-    },
-    {
-      "src": "/signin", 
-      "dest": "/public/access/sign_in/singin.html"
-    },
-    {
-      "src": "/auth/sms",
-      "dest": "/public/auth-methods/sms-otp/sms.html"
-    },
-    {
-      "src": "/auth/sms/verification",
-      "dest": "/public/auth-methods/sms-otp/verification/verification.html"
-    },
-    {
-      "src": "/auth/email",
-      "dest": "/public/auth-methods/email/email.html"
-    },
-    {
-      "src": "/auth/email/verification", 
-      "dest": "/public/auth-methods/email/verification/email_verification.html"
-    },
-    {
-      "src": "/auth/totp",
-      "dest": "/public/auth-methods/totp/qr_scan/qr.html"
-    },
-    {
-      "src": "/auth/totp/verification",
-      "dest": "/public/auth-methods/totp/verification/verification.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/public/index/index.html"
-    }
-  ]
+  "routes": []
 }
