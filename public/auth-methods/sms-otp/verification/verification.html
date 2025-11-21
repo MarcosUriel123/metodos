@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verificación SMS | SecureAuth</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="/public/pages/auth-methods/totp/verification/verification.css">
+    <!-- ✅ CORREGIDO - Ruta SMS correcta -->
+    <link rel="stylesheet" href="/public/auth-methods/sms-otp/verification/verification.css">
 </head>
 <body>
     <div class="verification-container">
@@ -62,13 +63,15 @@
 
             <!-- Footer -->
             <div class="verification-footer">
-                <a href="../log_in/login.html" class="back-link">
+                <!-- ✅ CORREGIDO - Ruta absoluta -->
+                <a href="/public/access/log_in/login.html" class="back-link">
                     <i class="fas fa-arrow-left"></i> Volver al login
                 </a>
             </div>
         </div>
     </div>
 
-<script src="/public/pages/auth-methods/totp/verification/verification.js"></script>
+    <!-- ✅ CORREGIDO - Ruta SMS correcta -->
+    <script src="/public/auth-methods/sms-otp/verification/verification.js"></script>
 </body>
 </html>
