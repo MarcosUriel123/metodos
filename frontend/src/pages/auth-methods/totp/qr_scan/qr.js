@@ -1,3 +1,20 @@
+// ✅ DETECCIÓN MEJORADA - FUNCIONA EN LOCAL Y PRODUCCIÓN
+const API_URL = (() => {
+    const hostname = window.location.hostname;
+    console.log('🔍 Detección ambiente - hostname:', hostname, 'port:', window.location.port);
+    
+    // Desarrollo: localhost, 127.0.0.1, o cualquier URL con puerto
+    if (hostname === 'localhost' || 
+        hostname === '127.0.0.1' ||
+        window.location.port !== '') {
+        console.log('🎯 MODO DESARROLLO - Usando localhost:5000');
+        return 'http://localhost:5000';
+    } else {
+        console.log('🚀 MODO PRODUCCIÓN - Usando Render.com');
+        return 'https://metodos-scwr.onrender.com';
+    }
+})();
+
 document.addEventListener("DOMContentLoaded", async () => {
     const container = document.getElementById("qrContainer");
     
@@ -12,8 +29,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (container.querySelector("img")) return;
 
     try {
-        // ✅ USAR EMAIL REAL en la URL
-        const response = await fetch(`http://localhost:5000/api/auth/totp/qr?email=${encodeURIComponent(userEmail)}`, {
+        // ✅ USAR EMAIL REAL en la URL - CORREGIDO CON API_URL
+        const response = await fetch(`${API_URL}/api/auth/totp/qr?email=${encodeURIComponent(userEmail)}`, {
             method: "GET",
             credentials: "include"
         });

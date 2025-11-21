@@ -1,3 +1,20 @@
+// ✅ DETECCIÓN MEJORADA - FUNCIONA EN LOCAL Y PRODUCCIÓN
+const API_URL = (() => {
+    const hostname = window.location.hostname;
+    console.log('🔍 Detección ambiente - hostname:', hostname, 'port:', window.location.port);
+    
+    // Desarrollo: localhost, 127.0.0.1, o cualquier URL con puerto
+    if (hostname === 'localhost' || 
+        hostname === '127.0.0.1' ||
+        window.location.port !== '') {
+        console.log('🎯 MODO DESARROLLO - Usando localhost:5000');
+        return 'http://localhost:5000';
+    } else {
+        console.log('🚀 MODO PRODUCCIÓN - Usando Render.com');
+        return 'https://metodos-scwr.onrender.com';
+    }
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Verification page loaded');
     
@@ -16,8 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             console.log('📞 Buscando información del usuario:', email);
             
-            // ✅ INTENTAR PRIMERO CON SMS, LUEGO CON EMAIL GENERAL
-            let response = await fetch(`http://localhost:5000/api/auth/sms/user-info?email=${encodeURIComponent(email)}`, {
+            // ✅ INTENTAR PRIMERO CON SMS, LUEGO CON EMAIL GENERAL - CORREGIDO CON API_URL
+            let response = await fetch(`${API_URL}/api/auth/sms/user-info?email=${encodeURIComponent(email)}`, {
                 method: 'GET',
                 credentials: 'include'
             });
@@ -25,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) {
                 // Si falla SMS, intentar con el endpoint general
                 console.log('⚠️ No se encontró en SMS, intentando con endpoint general...');
-                response = await fetch(`http://localhost:5000/api/auth/user-info?email=${encodeURIComponent(email)}`, {
+                response = await fetch(`${API_URL}/api/auth/user-info?email=${encodeURIComponent(email)}`, {
                     method: 'GET',
                     credentials: 'include'
                 });
@@ -106,8 +123,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 console.log('📱 Verificando OTP para teléfono:', userInfo.phone_number);
                 
-                // ✅ ENVIAR PARÁMETROS CORRECTOS
-                const response = await fetch('http://localhost:5000/api/auth/sms/verify-otp', {
+                // ✅ ENVIAR PARÁMETROS CORRECTOS - CORREGIDO CON API_URL
+                const response = await fetch(`${API_URL}/api/auth/sms/verify-otp`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -197,8 +214,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 console.log('📱 Reenviando OTP a teléfono:', userInfo.phone_number);
 
-                // ✅ USAR ENDPOINT CORRECTO CON PHONE NUMBER
-                const response = await fetch('http://localhost:5000/api/auth/sms/send-otp', {
+                // ✅ USAR ENDPOINT CORRECTO CON PHONE NUMBER - CORREGIDO CON API_URL
+                const response = await fetch(`${API_URL}/api/auth/sms/send-otp`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

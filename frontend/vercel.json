@@ -2,26 +2,50 @@
   "version": 2,
   "builds": [
     {
-      "src": "src/pages/**/*.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "src/pages/**/*.js", 
-      "use": "@vercel/static"
-    },
-    {
-      "src": "src/pages/**/*.css",
+      "src": "frontend/src/**/*",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/",
-      "dest": "/src/pages/index/index.html"
+      "dest": "/frontend/src/pages/index/index.html"
+    },
+    {
+      "src": "/login",
+      "dest": "/frontend/src/pages/access/log_in/login.html"
+    },
+    {
+      "src": "/signin",
+      "dest": "/frontend/src/pages/access/sign_in/singin.html"
+    },
+    {
+      "src": "/auth/sms",
+      "dest": "/frontend/src/pages/auth-methods/sms-otp/sms.html"
+    },
+    {
+      "src": "/auth/sms/verification",
+      "dest": "/frontend/src/pages/auth-methods/sms-otp/verification/verification.html"
+    },
+    {
+      "src": "/auth/email",
+      "dest": "/frontend/src/pages/auth-methods/email/email.html"
+    },
+    {
+      "src": "/auth/email/verification",
+      "dest": "/frontend/src/pages/auth-methods/email/verification/verification.html"
+    },
+    {
+      "src": "/auth/totp",
+      "dest": "/frontend/src/pages/auth-methods/totp/qr_scan/qr.html"
+    },
+    {
+      "src": "/auth/totp/verification",
+      "dest": "/frontend/src/pages/auth-methods/totp/verification/verification.html"
     },
     {
       "src": "/(.*)",
-      "dest": "/src/pages/index/index.html"
+      "dest": "/frontend/src/pages/index/index.html"
     }
   ]
 }

@@ -1,3 +1,20 @@
+// ✅ DETECCIÓN MEJORADA - FUNCIONA EN LOCAL Y PRODUCCIÓN
+const API_URL = (() => {
+    const hostname = window.location.hostname;
+    console.log('🔍 Detección ambiente - hostname:', hostname, 'port:', window.location.port);
+    
+    // Desarrollo: localhost, 127.0.0.1, o cualquier URL con puerto
+    if (hostname === 'localhost' || 
+        hostname === '127.0.0.1' ||
+        window.location.port !== '') {
+        console.log('🎯 MODO DESARROLLO - Usando localhost:5000');
+        return 'http://localhost:5000';
+    } else {
+        console.log('🚀 MODO PRODUCCIÓN - Usando Render.com');
+        return 'https://metodos-scwr.onrender.com';
+    }
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🔐 Email Verification page loaded');
     
@@ -159,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     }
 
-    // ✅ MANEJAR VERIFICACIÓN DEL CÓDIGO - CORREGIDO
+    // ✅ MANEJAR VERIFICACIÓN DEL CÓDIGO - CORREGIDO CON API_URL
     if (verificationForm) {
         verificationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -178,7 +195,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 console.log('🔍 Verificando código OTP...');
                 
-                const response = await fetch('http://localhost:5000/api/auth/email/verify-otp', {
+                // ✅ CAMBIO AQUÍ: Usar API_URL en lugar de localhost fijo
+                const response = await fetch(`${API_URL}/api/auth/email/verify-otp`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -233,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Manejar reenvío de código
+    // ✅ MANEJAR REENVÍO DE CÓDIGO - CORREGIDO CON API_URL
     if (resendBtn) {
         resendBtn.addEventListener('click', async () => {
             try {
@@ -242,7 +260,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 console.log('🔄 Reenviando código OTP...');
                 
-                const response = await fetch('http://localhost:5000/api/auth/resend-otp', {
+                // ✅ CAMBIO AQUÍ: Usar API_URL en lugar de localhost fijo
+                const response = await fetch(`${API_URL}/api/auth/resend-otp`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
