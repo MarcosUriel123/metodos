@@ -2,50 +2,50 @@
   "version": 2,
   "builds": [
     {
-      "src": "public/**/*",
+      "src": "public/**/*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "public/**/*.css", 
+      "use": "@vercel/static"
+    },
+    {
+      "src": "public/**/*.js",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/",
-      "dest": "/pages/index/index.html"
+      "dest": "/public/pages/index/index.html"
     },
     {
       "src": "/login",
-      "dest": "/pages/access/log_in/login.html"
+      "dest": "/public/pages/access/log_in/login.html"
     },
     {
       "src": "/signin", 
-      "dest": "/pages/access/sign_in/singin.html"
-    },
-    {
-      "src": "/auth/sms",
-      "dest": "/pages/auth-methods/sms-otp/sms.html"
-    },
-    {
-      "src": "/auth/sms/verification",
-      "dest": "/pages/auth-methods/sms-otp/verification/verification.html"
+      "dest": "/public/pages/access/sign_in/singin.html"
     },
     {
       "src": "/auth/email",
-      "dest": "/pages/auth-methods/email/email.html"
+      "dest": "/public/pages/auth-methods/email/email.html"
     },
     {
       "src": "/auth/email/verification", 
-      "dest": "/pages/auth-methods/email/verification/email_verification.html"
+      "dest": "/public/pages/auth-methods/email/verification/email_verification.html"
     },
     {
       "src": "/auth/totp",
-      "dest": "/pages/auth-methods/totp/qr_scan/qr.html"
+      "dest": "/public/pages/auth-methods/totp/qr_scan/qr.html"
     },
     {
       "src": "/auth/totp/verification",
-      "dest": "/pages/auth-methods/totp/verification/verification.html"
+      "dest": "/public/pages/auth-methods/totp/verification/verification.html"
     },
     {
       "src": "/(.*)",
-      "dest": "/pages/index/index.html"
+      "dest": "/public/pages/index/index.html"
     }
   ]
 }
