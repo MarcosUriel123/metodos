@@ -9,43 +9,43 @@
   "routes": [
     {
       "src": "/",
-      "dest": "/public/pages/index/index.html"
+      "dest": "/pages/index/index.html"
     },
     {
       "src": "/login",
-      "dest": "/public/pages/access/log_in/login.html"
+      "dest": "/pages/access/log_in/login.html"
     },
     {
       "src": "/signin", 
-      "dest": "/public/pages/access/sign_in/singin.html"
+      "dest": "/pages/access/sign_in/singin.html"
     },
     {
       "src": "/auth/sms",
-      "dest": "/public/pages/auth-methods/sms-otp/sms.html"
+      "dest": "/pages/auth-methods/sms-otp/sms.html"
     },
     {
       "src": "/auth/sms/verification",
-      "dest": "/public/pages/auth-methods/sms-otp/verification/verification.html"
+      "dest": "/pages/auth-methods/sms-otp/verification/verification.html"
     },
     {
       "src": "/auth/email",
-      "dest": "/public/pages/auth-methods/email/email.html"
+      "dest": "/pages/auth-methods/email/email.html"
     },
     {
       "src": "/auth/email/verification", 
-      "dest": "/public/pages/auth-methods/email/verification/email_verification.html"
+      "dest": "/pages/auth-methods/email/verification/email_verification.html"
     },
     {
       "src": "/auth/totp",
-      "dest": "/public/pages/auth-methods/totp/qr_scan/qr.html"
+      "dest": "/pages/auth-methods/totp/qr_scan/qr.html"
     },
     {
       "src": "/auth/totp/verification",
-      "dest": "/public/pages/auth-methods/totp/verification/verification.html"
+      "dest": "/pages/auth-methods/totp/verification/verification.html"
     },
     {
       "src": "/(.*)",
-      "dest": "/public/pages/index/index.html"
+      "dest": "/pages/index/index.html"
     }
   ]
 }
