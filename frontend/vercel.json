@@ -2,50 +2,50 @@
   "version": 2,
   "builds": [
     {
-      "src": "frontend/src/**/*",
+      "src": "public/**/*",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/",
-      "dest": "/frontend/src/pages/index/index.html"
+      "dest": "/public/pages/index/index.html"
     },
     {
       "src": "/login",
-      "dest": "/frontend/src/pages/access/log_in/login.html"
+      "dest": "/public/pages/access/log_in/login.html"
     },
     {
-      "src": "/signin",
-      "dest": "/frontend/src/pages/access/sign_in/singin.html"
+      "src": "/signin", 
+      "dest": "/public/pages/access/sign_in/singin.html"
     },
     {
       "src": "/auth/sms",
-      "dest": "/frontend/src/pages/auth-methods/sms-otp/sms.html"
+      "dest": "/public/pages/auth-methods/sms-otp/sms.html"
     },
     {
       "src": "/auth/sms/verification",
-      "dest": "/frontend/src/pages/auth-methods/sms-otp/verification/verification.html"
+      "dest": "/public/pages/auth-methods/sms-otp/verification/verification.html"
     },
     {
       "src": "/auth/email",
-      "dest": "/frontend/src/pages/auth-methods/email/email.html"
+      "dest": "/public/pages/auth-methods/email/email.html"
     },
     {
-      "src": "/auth/email/verification",
-      "dest": "/frontend/src/pages/auth-methods/email/verification/verification.html"
+      "src": "/auth/email/verification", 
+      "dest": "/public/pages/auth-methods/email/verification/email_verification.html"
     },
     {
       "src": "/auth/totp",
-      "dest": "/frontend/src/pages/auth-methods/totp/qr_scan/qr.html"
+      "dest": "/public/pages/auth-methods/totp/qr_scan/qr.html"
     },
     {
       "src": "/auth/totp/verification",
-      "dest": "/frontend/src/pages/auth-methods/totp/verification/verification.html"
+      "dest": "/public/pages/auth-methods/totp/verification/verification.html"
     },
     {
       "src": "/(.*)",
-      "dest": "/frontend/src/pages/index/index.html"
+      "dest": "/public/pages/index/index.html"
     }
   ]
 }
