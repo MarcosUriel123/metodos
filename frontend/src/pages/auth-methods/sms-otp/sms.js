@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.port !== '') {
             return 'http://localhost:5000';
         } else {
-            return 'https://auth-backend.onrender.com';
+            return 'https://metodos-scwr.onrender.com';
         }
     })();
 
