@@ -66,6 +66,7 @@
             id="your_email" 
             placeholder=" "
             required 
+            maxlength="100"
             pattern="[^@]+@[^@]+\.[a-zA-Z]{2,6}"
           />
           <label for="your_email" class="floating-label">
@@ -85,7 +86,7 @@
               minlength="10"
               maxlength="10"
               pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{10}$"
-              title="Exactamente 10 caracteres: debe incluir al menos una mayúscula, una minúscula y un número"
+              title="Exactamente 10 caracteres: 1 mayúscula, 1 minúscula y 1 número"
             />
             <label for="password" class="floating-label">
               <i class="fas fa-lock"></i> Contraseña (10 caracteres)
