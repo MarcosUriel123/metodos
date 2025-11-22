@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // ✅ REDIRECCIÓN
                     setTimeout(() => {
-                        window.location.href = "../../../index/index.html";
+                        window.location.href = "../../../index.html";
                     }, 1500);
                 } else {
                     showMessage(data.error || '❌ Código inválido', 'error');

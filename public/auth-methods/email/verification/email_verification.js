@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // Redirigir al dashboard después de 2 segundos
                     setTimeout(() => {
-                        window.location.href = '../../../index/index.html';
+                        window.location.href = '../../../index.html';
                     }, 2000);
                 } else {
                     showMessage('❌ Error: ' + (data.error || 'Código inválido'), 'error');

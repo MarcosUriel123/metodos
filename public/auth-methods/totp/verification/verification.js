@@ -116,7 +116,7 @@ btn_submt.addEventListener('click', () => {
             
             // Redirigir al index
             setTimeout(() => {
-                window.location.href = "../../../index/index.html";
+                window.location.href = "../../../index.html";
             }, 1000);
         } else {
             alert('❌ Código OTP inválido o expirado');
