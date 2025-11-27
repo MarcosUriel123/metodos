@@ -37,6 +37,59 @@ document.addEventListener('DOMContentLoaded', () => {
     const firstNameInput = document.getElementById('first_name');
     const lastNameInput = document.getElementById('last_name');
 
+    const emailInput = document.getElementById('your_email');
+
+// ✅ VALIDACIÓN: Bloquear símbolos especiales en email
+if (emailInput) {
+    emailInput.addEventListener('input', (e) => {
+        // Permitir solo: letras, números, @, ., _, %, +, -
+        let value = e.target.value;
+        value = value.replace(/[^a-zA-Z0-9@._%+-]/g, '');
+        
+        // Limitar a 100 caracteres
+        if (value.length > 100) {
+            value = value.substring(0, 100);
+        }
+        
+        e.target.value = value;
+    });
+    
+    emailInput.addEventListener('keydown', (e) => {
+        // Bloquear teclas de símbolos no permitidos
+        const invalidSymbols = ['!', '#', '$', '&', '*', '(', ')', '=', '[', ']', '{', '}', '|', '\\', '/', ':', ';', '"', "'", '<', '>', '?', '`', '~'];
+        if (invalidSymbols.includes(e.key)) {
+            e.preventDefault();
+            
+            // Mostrar mensaje temporal
+            const existingMsg = document.getElementById('tempEmailValidation');
+            if (existingMsg) existingMsg.remove();
+            
+            const msgDiv = document.createElement('div');
+            msgDiv.id = 'tempEmailValidation';
+            msgDiv.textContent = '❌ No se permiten símbolos especiales en el email';
+            msgDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #ff4444;
+                color: white;
+                padding: 10px 15px;
+                border-radius: 5px;
+                z-index: 10000;
+                font-size: 14px;
+            `;
+            
+            document.body.appendChild(msgDiv);
+            
+            setTimeout(() => {
+                if (msgDiv.parentNode) {
+                    msgDiv.parentNode.removeChild(msgDiv);
+                }
+            }, 2000);
+        }
+    });
+}
+
     // ✅ VALIDACIÓN: Solo permitir números en teléfono
     if (phoneNumberInput) {
         phoneNumberInput.addEventListener('input', (e) => {
