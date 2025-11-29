@@ -1,4 +1,6 @@
 import bcrypt
+import html
+import re
 from shared.database.mongo_connection import MongoDB
 
 class UserRepository:
@@ -11,6 +13,30 @@ class UserRepository:
         salt = bcrypt.gensalt()
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
         return hashed_password.decode('utf-8')
+    
+    def _sanitize_input(self, text):
+        """Sanitiza input para prevenir XSS y bloquea patrones peligrosos"""
+        if not text:
+            return text
+        
+        # ✅ BLOQUEAR PATRONES PELIGROSOS (case insensitive)
+        dangerous_patterns = [
+            'script', 'javascript', 'onload', 'onerror', 
+            'onclick', 'onmouseover', 'eval', 'alert',
+            'document', 'window', 'location', 'cookie'
+        ]
+        
+        text_lower = text.lower()
+        for pattern in dangerous_patterns:
+            if pattern in text_lower:
+                # Reemplazar patrones peligrosos con ***
+                text = re.sub(pattern, '***', text_lower, flags=re.IGNORECASE)
+                print(f"🛡️ Patrón peligroso detectado y sanitizado: {pattern}")
+        
+        # ✅ ESCAPAR CARACTERES HTML
+        sanitized_text = html.escape(text).strip()
+        
+        return sanitized_text
     
     def _check_password(self, plain_password, hashed_password):
         """Verifica si la contraseña coincide con el hash"""
@@ -25,7 +51,13 @@ class UserRepository:
             return False
     
     def create_user(self, user_data):
-        """Crea usuario cifrando automáticamente la contraseña"""
+        """Crea usuario SANITIZANDO y cifrando automáticamente la contraseña"""
+        # ✅ SANITIZAR CAMPOS DE TEXTO
+        if 'first_name' in user_data:
+            user_data['first_name'] = self._sanitize_input(user_data['first_name'])
+        if 'last_name' in user_data:
+            user_data['last_name'] = self._sanitize_input(user_data['last_name'])
+        
         # ✅ CIFRAR CONTRASEÑA AL REGISTRAR
         if 'password' in user_data:
             user_data['password'] = self._hash_password(user_data['password'])
@@ -59,7 +91,13 @@ class UserRepository:
         return self.users.find_one({"email": email}) is not None
     
     def update_user(self, email, update_data):
-        """Actualiza usuario, cifrando automáticamente la contraseña si está presente"""
+        """Actualiza usuario, SANITIZANDO y cifrando automáticamente la contraseña si está presente"""
+        # ✅ SANITIZAR CAMPOS DE TEXTO
+        if 'first_name' in update_data:
+            update_data['first_name'] = self._sanitize_input(update_data['first_name'])
+        if 'last_name' in update_data:
+            update_data['last_name'] = self._sanitize_input(update_data['last_name'])
+        
         # ✅ CIFRAR CONTRASEÑA SI SE ACTUALIZA
         if 'password' in update_data:
             update_data['password'] = self._hash_password(update_data['password'])
@@ -84,18 +122,19 @@ class UserRepository:
         else:
             # Si es texto plano (compatibilidad)
             return plain_password == hashed_password
-        
-def create_user(self, user_data):
-    """Crea usuario cifrando automáticamente la contraseña"""
-    print(f"🔴 DEBUG - CREATE_USER EJECUTADO")
-    print(f"🔴 Email: {user_data.get('email')}")
-    print(f"🔴 Contraseña antes: {user_data.get('password')}")
-    
-    # ✅ CIFRAR CONTRASEÑA AL REGISTRAR
-    if 'password' in user_data:
-        user_data['password'] = self._hash_password(user_data['password'])
-        print(f"🟢 Contraseña después: {user_data['password']}")
-    
-    result = self.users.insert_one(user_data)
-    print(f"🟢 USUARIO INSERTADO EN BD")
-    return result
+
+    # ⚠️ ELIMINAR ESTE MÉTODO DUPLICADO - ya existe arriba
+    # def create_user(self, user_data):
+    #     """Crea usuario cifrando automáticamente la contraseña"""
+    #     print(f"🔴 DEBUG - CREATE_USER EJECUTADO")
+    #     print(f"🔴 Email: {user_data.get('email')}")
+    #     print(f"🔴 Contraseña antes: {user_data.get('password')}")
+    #     
+    #     # ✅ CIFRAR CONTRASEÑA AL REGISTRAR
+    #     if 'password' in user_data:
+    #         user_data['password'] = self._hash_password(user_data['password'])
+    #         print(f"🟢 Contraseña después: {user_data['password']}")
+    #     
+    #     result = self.users.insert_one(user_data)
+    #     print(f"🟢 USUARIO INSERTADO EN BD")
+    #     return result
