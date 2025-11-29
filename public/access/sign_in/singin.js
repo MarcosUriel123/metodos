@@ -128,45 +128,47 @@ if (emailInput) {
     if (lastNameInput) validateNameInput(lastNameInput);
 
     // ✅ VALIDACIÓN: Contraseña en tiempo real
-    if (password) {
-        password.addEventListener('input', (e) => {
-            const value = e.target.value;
-            const passwordHint = document.querySelector('.password-hint');
+// ✅ VALIDACIÓN: Contraseña en tiempo real - CORREGIDO
+if (password) {
+    password.addEventListener('input', (e) => {
+        const value = e.target.value;
+        const passwordHint = document.querySelector('.password-hint');
+        
+        // Validar requisitos COMPLETOS
+        const hasUpperCase = /[A-Z]/.test(value);
+        const hasLowerCase = /[a-z]/.test(value);
+        const hasNumber = /\d/.test(value);
+        const hasNoSymbols = /^[a-zA-Z\d]*$/.test(value); // ✅ SOLO letras y números
+        const isValidLength = value.length === 10;
+        
+        // Verificar si es válida COMPLETAMENTE
+        const isValid = hasUpperCase && hasLowerCase && hasNumber && hasNoSymbols && isValidLength;
+        
+        // Actualizar hint con colores
+        if (passwordHint) {
+            let hintText = '';
             
-            // Validar requisitos
-            const hasUpperCase = /[A-Z]/.test(value);
-            const hasLowerCase = /[a-z]/.test(value);
-            const hasNumber = /\d/.test(value);
-            const hasNoSymbols = /^[a-zA-Z\d]+$/.test(value); 
-            const isValidLength = value.length === 10;
-            
-            const isValid = hasUpperCase && hasLowerCase && hasNumber && hasNoSymbols && isValidLength;
-
-            // Actualizar hint con colores
-            if (passwordHint) {
-                let hintText = '';
-                
-                if (!isValidLength) {
-                    hintText = `${value.length}/10 caracteres`;
-                } else if (!hasUpperCase || !hasLowerCase || !hasNumber) {
-                    hintText = 'Falta: ';
-                    if (!hasUpperCase) hintText += 'mayúscula ';
-                    if (!hasLowerCase) hintText += 'minúscula ';
-                    if (!hasNumber) hintText += 'número';
-                    if (!hasNoSymbols) hintText += 'símbolos detectados'; 
-                } else {
-                    hintText = '✅ Contraseña válida';
-                    passwordHint.style.color = '#10b981';
-                }
-                
-                if (!isValidLength || !hasUpperCase || !hasLowerCase || !hasNumber) {
-                    passwordHint.style.color = '#ef4444';
-                }
-                
-                passwordHint.textContent = hintText;
+            if (!isValidLength) {
+                hintText = `${value.length}/10 caracteres`;
+            } else if (!hasUpperCase || !hasLowerCase || !hasNumber || !hasNoSymbols) {
+                hintText = 'Falta: ';
+                if (!hasUpperCase) hintText += 'mayúscula ';
+                if (!hasLowerCase) hintText += 'minúscula ';
+                if (!hasNumber) hintText += 'número ';
+                if (!hasNoSymbols) hintText += '❌ Símbolos no permitidos';
+            } else {
+                hintText = '✅ Contraseña válida';
+                passwordHint.style.color = '#10b981';
             }
-        });
-    }
+            
+            if (!isValid) {
+                passwordHint.style.color = '#ef4444';
+            }
+            
+            passwordHint.textContent = hintText;
+        }
+    });
+}
 
     // Función para formatear número de teléfono
     function formatPhoneNumber(phone) {
