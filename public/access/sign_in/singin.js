@@ -151,7 +151,7 @@ if (password) {
             if (!isValidLength) {
                 hintText = `${value.length}/10 caracteres`;
             } else if (!hasUpperCase || !hasLowerCase || !hasNumber || !hasNoSymbols) {
-                hintText = 'Simbolos: ';
+                hintText = 'Simbolos ';
                 if (!hasUpperCase) hintText += 'mayúscula ';
                 if (!hasLowerCase) hintText += 'minúscula ';
                 if (!hasNumber) hintText += 'número ';
