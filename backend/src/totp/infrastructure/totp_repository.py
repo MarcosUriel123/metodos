@@ -16,18 +16,23 @@ class TOTPRepository(UserRepositoryPort):
         return hashed_password.decode('utf-8')
     
     def _sanitize_input(self, text):
-        """Sanitiza input para prevenir XSS - VERSIÓN ESTRICTA"""
+        """Sanitiza input para prevenir XSS - SIN RE-SANITIZACIÓN"""
         if not text:
             return text
         
-        # ✅ BLOQUEAR PATRONES PELIGROSOS
-        dangerous_patterns = [
-            'script', 'javascript', 'onload', 'onerror', 
-            'onclick', 'onmouseover', 'eval', 'alert'
-        ]
+        # ✅ REEMPLAZO SIMULTÁNEO (evita bucles)
+        patterns_to_replace = {
+            r'\bscript\b': '***',
+            r'\bjavascript\b': '***', 
+            r'\balert\b': '***',
+            r'\beval\b': '***',
+            r'\bonload\b': '***',
+            r'\bonerror\b': '***',
+            r'\bonclick\b': '***'
+        }
         
-        for pattern in dangerous_patterns:
-            text = re.sub(pattern, '***', text, flags=re.IGNORECASE)
+        for pattern, replacement in patterns_to_replace.items():
+            text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
         
         # ✅ ESCAPAR CARACTERES HTML
         sanitized_text = html.escape(text).strip()
