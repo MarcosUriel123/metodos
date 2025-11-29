@@ -84,3 +84,4 @@ class UserRepository:
         else:
             # Si es texto plano (compatibilidad)
             return plain_password == hashed_password
+        
