@@ -16,6 +16,7 @@ from password_recovery.application.password_recovery_usecases import (
     ResetPasswordUseCase
 )
 from password_recovery.infrastructure.password_recovery_repository import PasswordRecoveryRepository
+from shared.models.user_model import UserRepository  # ✅ AGREGAR ESTA IMPORTACIÓN
 
 # Configuración del Blueprint
 password_recovery_bp = Blueprint('password_recovery', __name__)
@@ -25,10 +26,13 @@ db = MongoDB.get_db()
 password_recovery_repo = PasswordRecoveryRepository(db)
 email_adapter = BrevoEmailAdapter()
 
+# ✅ INICIALIZAR UserRepository
+user_repo = UserRepository()
+
 # Casos de uso
 request_recovery_uc = RequestPasswordRecoveryUseCase(password_recovery_repo, email_adapter)
 verify_otp_uc = VerifyRecoveryOTPUseCase(password_recovery_repo)
-reset_password_uc = ResetPasswordUseCase(password_recovery_repo)
+reset_password_uc = ResetPasswordUseCase(password_recovery_repo, user_repo)  # ✅ AGREGAR user_repo
 
 @password_recovery_bp.route('/api/auth/password-recovery/request', methods=['POST'])
 def request_password_recovery():

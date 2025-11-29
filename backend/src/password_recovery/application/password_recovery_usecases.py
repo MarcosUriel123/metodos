@@ -120,8 +120,9 @@ class VerifyRecoveryOTPUseCase:
             }
 
 class ResetPasswordUseCase:
-    def __init__(self, password_recovery_repository):
+    def __init__(self, password_recovery_repository, user_repository):
         self.password_recovery_repo = password_recovery_repository
+        self.user_repo = user_repository  # ✅ AGREGAR UserRepository
     
     def execute(self, email, otp, new_password):
         """
@@ -149,8 +150,10 @@ class ResetPasswordUseCase:
                     'error': 'El código ha expirado. Solicita uno nuevo.'
                 }
             
-            # 3. Actualizar contraseña del usuario
-            update_result = self.password_recovery_repo.update_user_password(email, new_password)
+            # 3. ✅ ACTUALIZAR CONTRASEÑA USANDO user_repo.update_user()
+            update_data = {"password": new_password}
+            update_result = self.user_repo.update_user(email, update_data)
+            
             if not update_result:
                 return {
                     'success': False,
