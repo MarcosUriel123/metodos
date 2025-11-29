@@ -3,7 +3,6 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 import sys
-from flask_cors import CORS
 from datetime import datetime
 
 # 🔧 SOLUCIÓN DE IMPORTACIONES
@@ -17,7 +16,7 @@ load_dotenv()
 from sms_otp.adapters.http.flask_controller import sms_bp
 from totp.adapters.http.flask_controller import totp_bp
 
-# ✅ NUEVO: Importar blueprint de Email OTP - CORREGIDO para email_otp
+# ✅ MÓDULO EMAIL OTP (existente - SIN CAMBIOS)
 try:
     from email_otp.adapters.http.flask_controller import email_otp_blueprint
     EMAIL_OTP_AVAILABLE = True
@@ -26,7 +25,7 @@ except ImportError as e:
     EMAIL_OTP_AVAILABLE = False
     print(f"⚠️ Módulo Email OTP no disponible: {e}")
 
-# ✅ NUEVO: Importar blueprint de Password Recovery
+# ✅ NUEVO: Importar blueprint de Password Recovery - CORREGIDO
 try:
     from password_recovery.adapters.http.flask_controller import password_recovery_bp
     PASSWORD_RECOVERY_AVAILABLE = True
@@ -34,6 +33,8 @@ try:
 except ImportError as e:
     PASSWORD_RECOVERY_AVAILABLE = False
     print(f"⚠️ Módulo Password Recovery no disponible: {e}")
+    import traceback
+    traceback.print_exc()
     
 # Importar casos de uso existentes
 from sms_otp.application.sms_otp_usecases import SendOTPUseCase, VerifyOTPUseCase
@@ -43,21 +44,38 @@ from totp.application.register_user_usecase import RegisterUserUseCase
 from totp.infrastructure.totp_repository import TOTPRepository
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True)
+
+# ✅ CORS MEJORADO - Para Vercel + localhost
+CORS(app, 
+    supports_credentials=True,
+    origins=[
+        "http://localhost:*",
+        "http://127.0.0.1:*", 
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:5173",
+        "https://*.vercel.app",
+        "https://metodos-two.vercel.app"
+    ],
+    allow_headers=['Content-Type', 'Authorization'],
+    methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+)
+
 app.secret_key = os.getenv('SECRET_KEY', 'default-secret-key')
 
 # Registrar servicios existentes
 app.register_blueprint(sms_bp, url_prefix='/api/auth/sms')
 app.register_blueprint(totp_bp, url_prefix='/api/auth/totp')
 
-# ✅ NUEVO: Registrar blueprint de Email OTP si está disponible
+# ✅ Registrar blueprint de Email OTP si está disponible
 if EMAIL_OTP_AVAILABLE:
     app.register_blueprint(email_otp_blueprint, url_prefix='/api/auth/email')
+    print("✅ Blueprint de Email OTP registrado")
 
-# ✅ NUEVO: Registrar blueprint de Password Recovery si está disponible
+# ✅ NUEVO: Registrar blueprint de Password Recovery - SIN PREFIX (ya lo tiene en el blueprint)
 if PASSWORD_RECOVERY_AVAILABLE:
-    app.register_blueprint(password_recovery_bp, url_prefix='/api/auth/password-recovery')
-    print("✅ Blueprint de Password Recovery registrado")
+    app.register_blueprint(password_recovery_bp)
+    print("✅ Blueprint de Password Recovery registrado en /api/auth/password-recovery/*")
 
 # Inicializar servicios existentes
 user_repo = UserRepository()
@@ -69,7 +87,7 @@ totp_register_usecase = RegisterUserUseCase(TOTPRepository())
 # Solo pending_verifications en memoria (sesiones activas)
 pending_verifications = {}
 
-# ✅ REGISTRO UNIFICADO - CORREGIDO PARA EMAIL OTP
+# ✅ REGISTRO UNIFICADO (existente - SIN CAMBIOS)
 @app.route('/api/auth/register', methods=['POST'])
 def register():
     try:
@@ -94,11 +112,11 @@ def register():
         if user_repo.user_exists(email):
             return jsonify({'error': 'User already exists'}), 400
         
-        # ✅ NUEVO: Validación para Email OTP (no requiere phone_number)
+        # ✅ Validación para Email OTP (no requiere phone_number)
         if auth_method == 'sms' and not phone_number:
             return jsonify({'error': 'Phone number is required for SMS authentication'}), 400
         
-        # ✅ NUEVO: Manejar registro para Email OTP - CORREGIDO
+        # ✅ Manejar registro para Email OTP
         if auth_method == 'email':
             if not EMAIL_OTP_AVAILABLE:
                 return jsonify({'error': 'Email OTP service is not available'}), 500
@@ -122,9 +140,7 @@ def register():
             email_result = email_otp_usecases.send_otp(email)
             
             if email_result['success']:
-                pending_verifications[email] = email  # Para tracking
-                # ✅ NO establecer session['email'] aquí - el usuario debe verificar OTP primero
-                
+                pending_verifications[email] = email
                 print(f"✅ OTP enviado exitosamente por email a {email}")
                 
                 return jsonify({
@@ -136,7 +152,6 @@ def register():
                 }), 200
             else:
                 print("❌ Falló el envío de OTP por email")
-                # El usuario se registró pero falló el envío del email
                 return jsonify({
                     'success': True,
                     'message': 'User registered but failed to send OTP email',
@@ -147,7 +162,6 @@ def register():
         
         # Manejar SMS (existente - SIN CAMBIOS)
         elif auth_method == 'sms':
-            # Guardar usuario para SMS
             user_data = {
                 'email': email,
                 'password': password,
@@ -184,7 +198,6 @@ def register():
                 return jsonify({'error': 'Failed to send OTP'}), 500
         
         else:  # TOTP (existente - SIN CAMBIOS)
-            # Registrar usuario con TOTP
             try:
                 uri = totp_register_usecase.execute(email, password, first_name)
                 session['email'] = email
@@ -204,7 +217,7 @@ def register():
         print(f"❌ Error in register: {e}")
         return jsonify({'error': str(e)}), 500
 
-# ✅ LOGIN UNIFICADO - CORREGIDO DEFINITIVAMENTE PARA EMAIL OTP
+# ✅ LOGIN UNIFICADO (existente - SIN CAMBIOS)
 @app.route('/api/auth/login', methods=['POST'])
 def login():
     try:
@@ -233,14 +246,13 @@ def login():
         
         print(f"✅ Credenciales válidas para: {email}, método: {auth_method}")
         
-        # ✅ NUEVO: Manejar login para Email OTP - SIN SESIÓN INMEDIATA
+        # ✅ Manejar login para Email OTP
         if auth_method == 'email':
             if not EMAIL_OTP_AVAILABLE:
                 return jsonify({'error': 'Email OTP service is not available'}), 500
                 
             print(f"📤 ENVIANDO OTP por email a: {email}")
             
-            # CORREGIDO: Importación desde carpeta "email_otp"
             from email_otp.application.email_otp_usecases import EmailOTPUseCases
             email_otp_usecases = EmailOTPUseCases()
             email_result = email_otp_usecases.send_otp(email)
@@ -249,7 +261,6 @@ def login():
                 pending_verifications[email] = email
                 print(f"✅ OTP enviado exitosamente por email")
                 
-                # ✅ NO establecer session['email'] aquí - solo después de verificar OTP
                 return jsonify({
                     'success': True,
                     'requires_otp': True,
@@ -290,7 +301,6 @@ def login():
         else:  # TOTP (existente - SIN CAMBIOS)
             requires_otp = bool(user.get('secret'))
             
-            # ✅ SOLO PARA TOTP: Establecer sesión si no requiere OTP inmediato
             if not requires_otp:
                 session['email'] = email
             
@@ -305,7 +315,7 @@ def login():
         print(f"❌ Error in login: {e}")
         return jsonify({'error': str(e)}), 500
 
-# ✅ RESEND OTP - ACTUALIZADO CON EMAIL OTP
+# ✅ RESEND OTP (existente - SIN CAMBIOS)
 @app.route('/api/auth/resend-otp', methods=['POST'])
 def resend_otp():
     try:
@@ -315,19 +325,16 @@ def resend_otp():
         if not email:
             return jsonify({'error': 'Email is required'}), 400
         
-        # Buscar usuario para determinar el método de autenticación
         user = user_repo.find_by_email(email)
         if not user:
             return jsonify({'error': 'User not found'}), 404
         
         auth_method = user.get('auth_method', 'sms')
         
-        # ✅ NUEVO: Manejar reenvío para Email OTP
         if auth_method == 'email':
             if not EMAIL_OTP_AVAILABLE:
                 return jsonify({'error': 'Email OTP service is not available'}), 500
                 
-            # CORREGIDO: Importación desde carpeta "email_otp"
             from email_otp.application.email_otp_usecases import EmailOTPUseCases
             email_otp_usecases = EmailOTPUseCases()
             email_result = email_otp_usecases.send_otp(email)
@@ -337,7 +344,6 @@ def resend_otp():
             else:
                 return jsonify({'error': 'Failed to resend OTP email'}), 500
         
-        # Manejar SMS (existente - SIN CAMBIOS)
         elif auth_method == 'sms':
             phone_number = None
             
@@ -372,7 +378,6 @@ def sms_login():
         if not phone_number:
             return jsonify({'error': 'Phone number is required'}), 400
         
-        # BUSCAR USUARIO POR TELÉFONO
         user = user_repo.find_by_phone(phone_number)
         
         if not user:
@@ -383,13 +388,11 @@ def sms_login():
         
         email = user['email']
         
-        # CONFIGURAR SESIÓN
         session.clear()
         session['email'] = email
         session['phone_number'] = phone_number
         pending_verifications[email] = phone_number
         
-        # ENVIAR OTP
         success = send_otp_use_case.execute(phone_number)
         
         if success:
@@ -407,7 +410,7 @@ def sms_login():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# ✅ ENDPOINT PARA OBTENER USUARIO SMS (existente - SIN CAMBIOS)
+# ✅ SMS USER INFO (existente - SIN CAMBIOS)
 @app.route('/api/auth/sms/user-info', methods=['GET'])
 def sms_user_info():
     try:
@@ -421,7 +424,6 @@ def sms_user_info():
         if not user:
             return jsonify({'error': 'User not found'}), 404
         
-        # Verificar que sea usuario SMS
         if user.get('auth_method') != 'sms':
             return jsonify({'error': 'User is not registered with SMS method'}), 400
         
@@ -436,7 +438,7 @@ def sms_user_info():
         print(f"❌ Error in sms_user_info: {e}")
         return jsonify({'error': str(e)}), 500
 
-# ✅ LOGOUT ENDPOINT (existente - SIN CAMBIOS)
+# ✅ LOGOUT (existente - SIN CAMBIOS)
 @app.route('/api/auth/logout', methods=['POST'])
 def logout():
     try:
@@ -447,7 +449,7 @@ def logout():
         print(f"❌ Error en logout: {e}")
         return jsonify({'error': str(e)}), 500
 
-# ✅ RUTAS PRINCIPALES - ACTUALIZADO CON EMAIL OTP
+# ✅ HOME - ACTUALIZADO con Password Recovery
 @app.route('/')
 def home():
     endpoints = {
@@ -471,28 +473,33 @@ def home():
         }
     }
     
-    # ✅ NUEVO: Agregar endpoints de Email OTP si está disponible
+    available_services = ["sms", "totp"]
+    
     if EMAIL_OTP_AVAILABLE:
         endpoints["email"] = {
             "send_otp": "POST /api/auth/email/send-otp",
             "verify_otp": "POST /api/auth/email/verify-otp", 
             "user_info": "GET /api/auth/email/user-info?email=user@example.com"
         }
+        available_services.append("email")
     
-    # ✅ NUEVO: Agregar endpoints de Password Recovery si está disponible
+    # ✅ NUEVO: Agregar endpoints de Password Recovery
     if PASSWORD_RECOVERY_AVAILABLE:
         endpoints["password_recovery"] = {
             "request": "POST /api/auth/password-recovery/request",
             "verify_otp": "POST /api/auth/password-recovery/verify-otp",
             "reset": "POST /api/auth/password-recovery/reset"
         }
+        available_services.append("password_recovery")
     
     return jsonify({
         "message": "Sistema de Autenticación Unificado",
-        "available_services": ["sms", "totp", "email", "password_recovery"] if EMAIL_OTP_AVAILABLE and PASSWORD_RECOVERY_AVAILABLE else ["sms", "totp", "password_recovery"] if PASSWORD_RECOVERY_AVAILABLE else ["sms", "totp"],
+        "version": "2.1",
+        "available_services": available_services,
         "endpoints": endpoints
     })
 
+# ✅ HEALTH CHECK - ACTUALIZADO
 @app.route('/health', methods=['GET'])
 def health():
     services = ["sms_otp", "totp"]
@@ -504,10 +511,11 @@ def health():
     return jsonify({
         "status": "healthy",
         "services": services,
-        "port": 5000
+        "port": 5000,
+        "mongodb": "connected"
     })
 
-# ✅ ENDPOINT GENERAL PARA OBTENER INFORMACIÓN DEL USUARIO (existente - SIN CAMBIOS)
+# ✅ USER INFO GENERAL (existente - SIN CAMBIOS)
 @app.route('/api/auth/user-info', methods=['GET'])
 def get_user_info():
     try:
@@ -534,28 +542,24 @@ def get_user_info():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
+    print("=" * 60)
     print("🚀 Servidor de Autenticación Unificado iniciado")
+    print("=" * 60)
     print("📡 http://localhost:5000")
     print("🔐 Servicios disponibles:")
-    print("   - SMS OTP: /api/auth/sms/*")
-    print("   - TOTP: /api/auth/totp/*") 
+    print("   ✅ SMS OTP: /api/auth/sms/*")
+    print("   ✅ TOTP: /api/auth/totp/*") 
     if EMAIL_OTP_AVAILABLE:
-        print("   - Email OTP: /api/auth/email/*")
+        print("   ✅ Email OTP: /api/auth/email/*")
     if PASSWORD_RECOVERY_AVAILABLE:
-        print("   - Password Recovery: /api/auth/password-recovery/*")
-    print("   - Auth: /api/auth/register, /api/auth/login, /api/auth/logout, etc.")
-    print("=" * 50)
-    app.run(debug=True, port=5000)
-
-    CORS(app, 
-        supports_credentials=True,
-        origins=[
-            "http://localhost:*",
-            "http://127.0.0.1:*", 
-            "https://*.vercel.app",
-            "https://metodos-two.vercel.app"
-        ]
-)
-
-if __name__ == '__main__':
-    app.run(debug=True, host='127.0.0.1', port=5000, use_reloader=False)
+        print("   ✅ Password Recovery: /api/auth/password-recovery/*")
+    print("   ✅ Auth: /api/auth/register, /api/auth/login, etc.")
+    print("=" * 60)
+    
+    port = int(os.environ.get('PORT', 5000))
+    app.run(
+        debug=True, 
+        host='0.0.0.0', 
+        port=port,
+        use_reloader=False
+    )

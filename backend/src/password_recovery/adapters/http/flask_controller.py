@@ -2,10 +2,12 @@ from flask import Blueprint, request, jsonify
 import sys
 import os
 
-# 🔧 SOLUCIÓN DE IMPORTACIONES
-current_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-sys.path.insert(0, current_dir)
+# 🔧 SOLUCIÓN DE IMPORTACIONES - Path absoluto desde src
+current_dir = os.path.dirname(os.path.abspath(__file__))
+src_dir = os.path.join(current_dir, '..', '..', '..')
+sys.path.insert(0, src_dir)
 
+# Importaciones con paths absolutos desde src
 from shared.database.mongo_connection import MongoDB
 from email_otp.infrastructure.brevo_email_adapter import BrevoEmailAdapter
 from password_recovery.application.password_recovery_usecases import (
@@ -62,6 +64,8 @@ def request_password_recovery():
             
     except Exception as e:
         print(f"❌ Error en request_password_recovery: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({
             'success': False,
             'error': 'Error interno del servidor'
@@ -102,6 +106,8 @@ def verify_recovery_otp():
             
     except Exception as e:
         print(f"❌ Error en verify_recovery_otp: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({
             'success': False,
             'error': 'Error interno del servidor'
@@ -124,6 +130,38 @@ def reset_password():
                 'error': 'Email, código y nueva contraseña son requeridos'
             }), 400
         
+        # ✅ VALIDACIÓN DE CONTRASEÑA (mismas reglas que registro)
+        if len(new_password) != 10:
+            return jsonify({
+                'success': False,
+                'error': 'La contraseña debe tener exactamente 10 caracteres'
+            }), 400
+        
+        if not any(c.isupper() for c in new_password):
+            return jsonify({
+                'success': False,
+                'error': 'La contraseña debe contener al menos una mayúscula'
+            }), 400
+        
+        if not any(c.islower() for c in new_password):
+            return jsonify({
+                'success': False,
+                'error': 'La contraseña debe contener al menos una minúscula'
+            }), 400
+        
+        if not any(c.isdigit() for c in new_password):
+            return jsonify({
+                'success': False,
+                'error': 'La contraseña debe contener al menos un número'
+            }), 400
+        
+        # No permitir símbolos especiales
+        if not new_password.isalnum():
+            return jsonify({
+                'success': False,
+                'error': 'La contraseña solo puede contener letras y números'
+            }), 400
+        
         print(f"🔐 Restableciendo contraseña para: {email}")
         
         # Ejecutar caso de uso
@@ -142,6 +180,8 @@ def reset_password():
             
     except Exception as e:
         print(f"❌ Error en reset_password: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({
             'success': False,
             'error': 'Error interno del servidor'
