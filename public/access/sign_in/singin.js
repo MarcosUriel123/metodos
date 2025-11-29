@@ -150,12 +150,13 @@ if (password) {
             
             if (!isValidLength) {
                 hintText = `${value.length}/10 caracteres`;
-            } else if (!hasUpperCase || !hasLowerCase || !hasNumber || !hasNoSymbols) {
-                hintText = 'Simbolos ';
+            } else if (!hasNoSymbols) {
+                hintText = '❌ Símbolos no permitidos';  // ✅ PRIORIDAD para símbolos
+            } else if (!hasUpperCase || !hasLowerCase || !hasNumber) {
+                hintText = 'Falta: ';
                 if (!hasUpperCase) hintText += 'mayúscula ';
                 if (!hasLowerCase) hintText += 'minúscula ';
-                if (!hasNumber) hintText += 'número ';
-                if (!hasNoSymbols) hintText += 'no permitidos';
+                if (!hasNumber) hintText += 'número';
             } else {
                 hintText = '✅ Contraseña válida';
                 passwordHint.style.color = '#10b981';
