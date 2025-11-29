@@ -238,7 +238,7 @@ def register():
         print(f"❌ Error in register: {e}")
         return jsonify({'error': str(e)}), 500
 
-# ✅ LOGIN UNIFICADO (existente - SIN CAMBIOS)
+# ✅ LOGIN UNIFICADO - CORREGIDO PARA CIFRADO
 @app.route('/api/auth/login', methods=['POST'])
 def login():
     try:
@@ -259,7 +259,8 @@ def login():
         if not user:
             return jsonify({'error': 'User not found'}), 404
         
-        if user['password'] != password:
+        # ✅ LÍNEA CORREGIDA - VERIFICACIÓN CON CIFRADO
+        if not user_repo.verify_password_for_login(email, password):
             return jsonify({'error': 'Invalid password'}), 401
         
         auth_method = user.get('auth_method', 'sms')
