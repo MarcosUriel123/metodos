@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         // Redirigir al login después de 3 segundos
                         setTimeout(() => {
-                            window.location.href = '/acccess/log_in/login.html';
+                        window.location.href = '/access/log_in/login.html';
                         }, 3000);
                     } else {
                         showMessage('❌ ' + (data.error || 'Error al actualizar la contraseña'), 'error');
