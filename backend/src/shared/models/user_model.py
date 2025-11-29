@@ -15,23 +15,18 @@ class UserRepository:
         return hashed_password.decode('utf-8')
     
     def _sanitize_input(self, text):
-        """Sanitiza input para prevenir XSS y bloquea patrones peligrosos"""
+        """Sanitiza input para prevenir XSS - VERSIÓN ESTRICTA"""
         if not text:
             return text
         
-        # ✅ BLOQUEAR PATRONES PELIGROSOS (case insensitive)
+        # ✅ BLOQUEAR PATRONES PELIGROSOS
         dangerous_patterns = [
             'script', 'javascript', 'onload', 'onerror', 
-            'onclick', 'onmouseover', 'eval', 'alert',
-            'document', 'window', 'location', 'cookie'
+            'onclick', 'onmouseover', 'eval', 'alert'
         ]
         
-        text_lower = text.lower()
         for pattern in dangerous_patterns:
-            if pattern in text_lower:
-                # Reemplazar patrones peligrosos con ***
-                text = re.sub(pattern, '***', text_lower, flags=re.IGNORECASE)
-                print(f"🛡️ Patrón peligroso detectado y sanitizado: {pattern}")
+            text = re.sub(pattern, '***', text, flags=re.IGNORECASE)
         
         # ✅ ESCAPAR CARACTERES HTML
         sanitized_text = html.escape(text).strip()
@@ -122,19 +117,3 @@ class UserRepository:
         else:
             # Si es texto plano (compatibilidad)
             return plain_password == hashed_password
-
-    # ⚠️ ELIMINAR ESTE MÉTODO DUPLICADO - ya existe arriba
-    # def create_user(self, user_data):
-    #     """Crea usuario cifrando automáticamente la contraseña"""
-    #     print(f"🔴 DEBUG - CREATE_USER EJECUTADO")
-    #     print(f"🔴 Email: {user_data.get('email')}")
-    #     print(f"🔴 Contraseña antes: {user_data.get('password')}")
-    #     
-    #     # ✅ CIFRAR CONTRASEÑA AL REGISTRAR
-    #     if 'password' in user_data:
-    #         user_data['password'] = self._hash_password(user_data['password'])
-    #         print(f"🟢 Contraseña después: {user_data['password']}")
-    #     
-    #     result = self.users.insert_one(user_data)
-    #     print(f"🟢 USUARIO INSERTADO EN BD")
-    #     return result

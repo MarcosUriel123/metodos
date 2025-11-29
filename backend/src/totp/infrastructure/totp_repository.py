@@ -1,4 +1,6 @@
 import bcrypt
+import html
+import re
 from shared.database.mongo_connection import MongoDB
 from ..ports.user_repository_port import UserRepositoryPort
 
@@ -13,16 +15,38 @@ class TOTPRepository(UserRepositoryPort):
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
         return hashed_password.decode('utf-8')
     
+    def _sanitize_input(self, text):
+        """Sanitiza input para prevenir XSS - VERSIÓN ESTRICTA"""
+        if not text:
+            return text
+        
+        # ✅ BLOQUEAR PATRONES PELIGROSOS
+        dangerous_patterns = [
+            'script', 'javascript', 'onload', 'onerror', 
+            'onclick', 'onmouseover', 'eval', 'alert'
+        ]
+        
+        for pattern in dangerous_patterns:
+            text = re.sub(pattern, '***', text, flags=re.IGNORECASE)
+        
+        # ✅ ESCAPAR CARACTERES HTML
+        sanitized_text = html.escape(text).strip()
+        
+        return sanitized_text
+    
     def save_user(self, email, secret, password, first_name, auth_method="totp"):
+        # ✅ SANITIZAR first_name
+        sanitized_first_name = self._sanitize_input(first_name)
+        
         # ✅ CIFRAR CONTRASEÑA ANTES DE GUARDAR
         hashed_password = self._hash_password(password)
         
-        print(f"🔐 TOTP - Contraseña cifrada para: {email}")
+        print(f"🔐 TOTP - Usuario sanitizado: {sanitized_first_name}")
         
         return self.users.insert_one({
             "email": email,
             "password": hashed_password,  # ✅ CONTRASEÑA CIFRADA
-            "first_name": first_name,
+            "first_name": sanitized_first_name,  # ✅ NOMBRE SANITIZADO
             "secret": secret,
             "auth_method": auth_method,
             "phone_number": None
