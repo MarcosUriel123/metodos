@@ -151,11 +151,11 @@ if (password) {
             if (!isValidLength) {
                 hintText = `${value.length}/10 caracteres`;
             } else if (!hasUpperCase || !hasLowerCase || !hasNumber || !hasNoSymbols) {
-                hintText = 'Falta: ';
+                hintText = 'Simbolos: ';
                 if (!hasUpperCase) hintText += 'mayúscula ';
                 if (!hasLowerCase) hintText += 'minúscula ';
                 if (!hasNumber) hintText += 'número ';
-                if (!hasNoSymbols) hintText += '❌ Símbolos no permitidos';
+                if (!hasNoSymbols) hintText += 'no permitidos';
             } else {
                 hintText = '✅ Contraseña válida';
                 passwordHint.style.color = '#10b981';
