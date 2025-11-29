@@ -85,3 +85,17 @@ class UserRepository:
             # Si es texto plano (compatibilidad)
             return plain_password == hashed_password
         
+def create_user(self, user_data):
+    """Crea usuario cifrando automáticamente la contraseña"""
+    print(f"🔴 DEBUG - CREATE_USER EJECUTADO")
+    print(f"🔴 Email: {user_data.get('email')}")
+    print(f"🔴 Contraseña antes: {user_data.get('password')}")
+    
+    # ✅ CIFRAR CONTRASEÑA AL REGISTRAR
+    if 'password' in user_data:
+        user_data['password'] = self._hash_password(user_data['password'])
+        print(f"🟢 Contraseña después: {user_data['password']}")
+    
+    result = self.users.insert_one(user_data)
+    print(f"🟢 USUARIO INSERTADO EN BD")
+    return result
