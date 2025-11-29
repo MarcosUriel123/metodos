@@ -292,6 +292,12 @@ document.getElementById("registerBtn").addEventListener("click", async () => {
     const registerMessage = document.getElementById('registerMessage');
     const registerBtn = document.getElementById('registerBtn');
 
+    const hasNoSymbols = /^[a-zA-Z\d]+$/.test(password);
+    if (!hasNoSymbols) {
+        showMessage("❌ La contraseña no puede contener símbolos especiales (@, ., etc)", 'error');
+        return;
+    }
+    
     // Función para formatear número de teléfono
     function formatPhoneNumber(phone) {
         const cleaned = phone.replace(/\D/g, '');
