@@ -25,6 +25,15 @@ try:
 except ImportError as e:
     EMAIL_OTP_AVAILABLE = False
     print(f"⚠️ Módulo Email OTP no disponible: {e}")
+
+# ✅ NUEVO: Importar blueprint de Password Recovery
+try:
+    from password_recovery.adapters.http.flask_controller import password_recovery_bp
+    PASSWORD_RECOVERY_AVAILABLE = True
+    print("✅ Módulo Password Recovery cargado correctamente")
+except ImportError as e:
+    PASSWORD_RECOVERY_AVAILABLE = False
+    print(f"⚠️ Módulo Password Recovery no disponible: {e}")
     
 # Importar casos de uso existentes
 from sms_otp.application.sms_otp_usecases import SendOTPUseCase, VerifyOTPUseCase
@@ -44,6 +53,11 @@ app.register_blueprint(totp_bp, url_prefix='/api/auth/totp')
 # ✅ NUEVO: Registrar blueprint de Email OTP si está disponible
 if EMAIL_OTP_AVAILABLE:
     app.register_blueprint(email_otp_blueprint, url_prefix='/api/auth/email')
+
+# ✅ NUEVO: Registrar blueprint de Password Recovery si está disponible
+if PASSWORD_RECOVERY_AVAILABLE:
+    app.register_blueprint(password_recovery_bp, url_prefix='/api/auth/password-recovery')
+    print("✅ Blueprint de Password Recovery registrado")
 
 # Inicializar servicios existentes
 user_repo = UserRepository()
@@ -465,9 +479,17 @@ def home():
             "user_info": "GET /api/auth/email/user-info?email=user@example.com"
         }
     
+    # ✅ NUEVO: Agregar endpoints de Password Recovery si está disponible
+    if PASSWORD_RECOVERY_AVAILABLE:
+        endpoints["password_recovery"] = {
+            "request": "POST /api/auth/password-recovery/request",
+            "verify_otp": "POST /api/auth/password-recovery/verify-otp",
+            "reset": "POST /api/auth/password-recovery/reset"
+        }
+    
     return jsonify({
         "message": "Sistema de Autenticación Unificado",
-        "available_services": ["sms", "totp", "email"] if EMAIL_OTP_AVAILABLE else ["sms", "totp"],
+        "available_services": ["sms", "totp", "email", "password_recovery"] if EMAIL_OTP_AVAILABLE and PASSWORD_RECOVERY_AVAILABLE else ["sms", "totp", "password_recovery"] if PASSWORD_RECOVERY_AVAILABLE else ["sms", "totp"],
         "endpoints": endpoints
     })
 
@@ -476,6 +498,8 @@ def health():
     services = ["sms_otp", "totp"]
     if EMAIL_OTP_AVAILABLE:
         services.append("email_otp")
+    if PASSWORD_RECOVERY_AVAILABLE:
+        services.append("password_recovery")
     
     return jsonify({
         "status": "healthy",
@@ -516,7 +540,9 @@ if __name__ == '__main__':
     print("   - SMS OTP: /api/auth/sms/*")
     print("   - TOTP: /api/auth/totp/*") 
     if EMAIL_OTP_AVAILABLE:
-        print("   - Email OTP: /api/auth/email/*")  # ✅ NUEVO
+        print("   - Email OTP: /api/auth/email/*")
+    if PASSWORD_RECOVERY_AVAILABLE:
+        print("   - Password Recovery: /api/auth/password-recovery/*")
     print("   - Auth: /api/auth/register, /api/auth/login, /api/auth/logout, etc.")
     print("=" * 50)
     app.run(debug=True, port=5000)

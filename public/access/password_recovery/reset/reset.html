@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Restablecer Contraseña | SecureAuth</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="reset.css">
+</head>
+<body>
+  <div class="reset-container">
+    <div class="reset-card">
+      
+      <!-- Header -->
+      <div class="reset-header">
+        <div class="reset-icon">
+          <i class="fas fa-lock"></i>
+        </div>
+        <h1 class="reset-title">Nueva Contraseña</h1>
+        <p class="reset-subtitle" id="userEmail">
+          <!-- El email se insertará dinámicamente -->
+        </p>
+      </div>
+
+      <!-- Formulario -->
+      <form id="resetForm" class="reset-form">
+        
+        <!-- Código de Verificación -->
+        <div class="form-group">
+          <input 
+            type="text" 
+            class="form-input" 
+            id="otp" 
+            placeholder=" "
+            required 
+            maxlength="6"
+            pattern="[0-9]{6}"
+            title="Ingresa el código de 6 dígitos"
+          />
+          <label for="otp" class="floating-label">
+            <i class="fas fa-shield-alt"></i> Código de Verificación
+          </label>
+          <div class="input-hint">Ingresa el código de 6 dígitos enviado a tu email</div>
+        </div>
+
+        <!-- Nueva Contraseña -->
+        <div class="form-group">
+          <div class="input-group">
+            <input 
+              type="password" 
+              class="form-input" 
+              id="newPassword" 
+              placeholder=" "
+              required 
+              minlength="10"
+              maxlength="10"
+              pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{10}$"
+              title="Exactamente 10 caracteres: 1 mayúscula, 1 minúscula y 1 número. No se permiten símbolos especiales"
+            />
+            <label for="newPassword" class="floating-label">
+              <i class="fas fa-lock"></i> Nueva Contraseña
+            </label>
+            <button type="button" class="password-toggle" id="toggleNewPassword">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+          <div class="password-hint">10 caracteres: 1 mayúscula, 1 minúscula y 1 número</div>
+        </div>
+
+        <!-- Confirmar Nueva Contraseña -->
+        <div class="form-group">
+          <div class="input-group">
+            <input 
+              type="password" 
+              class="form-input" 
+              id="confirmNewPassword" 
+              placeholder=" "
+              required 
+              minlength="10"
+              maxlength="10"
+            />
+            <label for="confirmNewPassword" class="floating-label">
+              <i class="fas fa-lock"></i> Confirmar Nueva Contraseña
+            </label>
+            <button type="button" class="password-toggle" id="toggleConfirmNewPassword">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Botón de restablecimiento -->
+        <button type="button" id="resetBtn" class="reset-btn">
+          <i class="fas fa-sync-alt"></i> Restablecer Contraseña
+        </button>
+
+        <!-- Mensajes del sistema -->
+        <div id="resetMessage" class="reset-message" style="display: none;"></div>
+
+      </form>
+
+      <!-- Opciones adicionales -->
+      <div class="reset-options">
+        <div class="option-item">
+          <a href="../request/request.html" class="option-link">
+            <i class="fas fa-arrow-left"></i>
+            Volver a solicitar código
+          </a>
+        </div>
+        <div class="option-item">
+          <a href="../log_in/login.html" class="option-link">
+            <i class="fas fa-sign-in-alt"></i>
+            Volver al inicio de sesión
+          </a>
+        </div>
+      </div>
+
+      <!-- Información de seguridad -->
+      <div class="security-info">
+        <div class="security-title">
+          <i class="fas fa-info-circle"></i>
+          Información de Seguridad
+        </div>
+        <div class="security-items">
+          <div class="security-item">
+            <i class="fas fa-clock"></i>
+            <span>El código expira en 10 minutos</span>
+          </div>
+          <div class="security-item">
+            <i class="fas fa-shield-alt"></i>
+            <span>Tu nueva contraseña será encriptada</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="reset.js"></script>
+</body>
+</html>
