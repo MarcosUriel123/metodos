@@ -78,14 +78,15 @@
         <div class="form-group">
           <div class="input-group">
             <input 
-              type="email" 
+              type="password" 
               class="form-input" 
-              id="your_email" 
+              id="password" 
               placeholder=" "
               required 
-              maxlength="100"
-              pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$"
-              title="Solo letras, números, puntos, guiones y @. No se permiten símbolos especiales"
+              minlength="10"
+              maxlength="10"
+              pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{10}$"
+              title="Exactamente 10 caracteres: 1 mayúscula, 1 minúscula y 1 número. No se permiten símbolos especiales"
             />
             <label for="password" class="floating-label">
               <i class="fas fa-lock"></i> Contraseña (10 caracteres)
