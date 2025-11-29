@@ -137,8 +137,11 @@ if (emailInput) {
             const hasUpperCase = /[A-Z]/.test(value);
             const hasLowerCase = /[a-z]/.test(value);
             const hasNumber = /\d/.test(value);
+            const hasNoSymbols = /^[a-zA-Z\d]+$/.test(value); 
             const isValidLength = value.length === 10;
             
+            const isValid = hasUpperCase && hasLowerCase && hasNumber && hasNoSymbols && isValidLength;
+
             // Actualizar hint con colores
             if (passwordHint) {
                 let hintText = '';
@@ -150,6 +153,7 @@ if (emailInput) {
                     if (!hasUpperCase) hintText += 'mayúscula ';
                     if (!hasLowerCase) hintText += 'minúscula ';
                     if (!hasNumber) hintText += 'número';
+                    if (!hasNoSymbols) hintText += 'símbolos detectados'; 
                 } else {
                     hintText = '✅ Contraseña válida';
                     passwordHint.style.color = '#10b981';
