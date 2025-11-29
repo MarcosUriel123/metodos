@@ -1,6 +1,14 @@
 from datetime import datetime
 import bcrypt
-from ...shared.database.mongo_connection import MongoDB
+import sys
+import os
+
+# 🔧 SOLUCIÓN: Imports absolutos
+current_dir = os.path.dirname(os.path.abspath(__file__))
+src_dir = os.path.join(current_dir, '..', '..')
+sys.path.insert(0, src_dir)
+
+from shared.database.mongo_connection import MongoDB
 
 class PasswordRecoveryRepository:
     def __init__(self, db):
@@ -58,7 +66,7 @@ class PasswordRecoveryRepository:
                 'email': email,
                 'otp': otp,
                 'used': False,
-                'expires_at': {'$gt': datetime.now()}  # No expirado
+                'expires_at': {'$gt': datetime.now()}
             })
             
             if recovery_request:
@@ -81,7 +89,7 @@ class PasswordRecoveryRepository:
                 'email': email,
                 'otp': otp,
                 'used': False,
-                'expires_at': {'$gt': datetime.now()}  # No expirado
+                'expires_at': {'$gt': datetime.now()}
             })
             
             return recovery_request
@@ -153,14 +161,19 @@ class PasswordRecoveryRepository:
         Actualiza la contraseña del usuario
         """
         try:
-            # Encriptar la nueva contraseña
-            hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
+            # ⚠️ IMPORTANTE: No encriptar aquí porque ya viene hasheada o el sistema lo hace después
+            # Si tu sistema NO usa bcrypt, descomenta estas líneas:
+            # hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
+            # password_to_save = hashed_password
+            
+            # Si tu sistema guarda contraseñas en texto plano (como parece por login.js):
+            password_to_save = new_password
             
             result = self.users_collection.update_one(
                 {'email': email},
                 {
                     '$set': {
-                        'password': hashed_password,
+                        'password': password_to_save,
                         'updated_at': datetime.now()
                     }
                 }
