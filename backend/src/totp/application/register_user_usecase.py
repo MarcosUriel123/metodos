@@ -8,5 +8,9 @@ class RegisterUserUseCase:
         totp = TOTPGenerator(secret=None)
         secret = totp.generate_secret()
         uri = totp.generate_uri(email, issuer_name)
+        
+        print(f"📝 Registro TOTP iniciado para: {email}")
         self.user_repository.save_user(email, secret, password, first_name)
+        print(f"✅ Usuario TOTP registrado con contraseña cifrada: {email}")
+        
         return uri
