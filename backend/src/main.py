@@ -25,7 +25,7 @@ except ImportError as e:
     EMAIL_OTP_AVAILABLE = False
     print(f"⚠️ Módulo Email OTP no disponible: {e}")
 
-# ✅ NUEVO: Importar blueprint de Password Recovery - CORREGIDO
+# ✅ MÓDULO PASSWORD RECOVERY
 try:
     from password_recovery.adapters.http.flask_controller import password_recovery_bp
     PASSWORD_RECOVERY_AVAILABLE = True
@@ -45,23 +45,50 @@ from totp.infrastructure.totp_repository import TOTPRepository
 
 app = Flask(__name__)
 
-# ✅ CORS MEJORADO - Para Vercel + localhost
+# 🚨 CORS CRÍTICO - CONFIGURACIÓN COMPLETA PARA VERCEL + RENDER
 CORS(app, 
-    supports_credentials=True,
-    origins=[
-        "http://localhost:*",
-        "http://127.0.0.1:*", 
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:5173",
-        "https://*.vercel.app",
-        "https://metodos-two.vercel.app"
-    ],
-    allow_headers=['Content-Type', 'Authorization'],
-    methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+    resources={
+        r"/api/*": {
+            "origins": [
+                "http://localhost:*",
+                "http://127.0.0.1:*",
+                "http://localhost:3000",
+                "http://127.0.0.1:3000",
+                "http://localhost:5173",
+                "https://metodos-two.vercel.app",
+                "https://*.vercel.app"
+            ],
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization", "X-Requested-With"],
+            "supports_credentials": True,
+            "max_age": 3600
+        }
+    }
 )
 
 app.secret_key = os.getenv('SECRET_KEY', 'default-secret-key')
+
+# 🔧 MIDDLEWARE ADICIONAL PARA CORS (por si acaso)
+@app.after_request
+def after_request(response):
+    origin = request.headers.get('Origin')
+    
+    allowed_origins = [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+        'http://localhost:5173',
+        'https://metodos-two.vercel.app'
+    ]
+    
+    # Permitir cualquier subdominio de vercel.app
+    if origin and (origin in allowed_origins or origin.endswith('.vercel.app')):
+        response.headers['Access-Control-Allow-Origin'] = origin
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With'
+        response.headers['Access-Control-Max-Age'] = '3600'
+    
+    return response
 
 # Registrar servicios existentes
 app.register_blueprint(sms_bp, url_prefix='/api/auth/sms')
@@ -72,7 +99,7 @@ if EMAIL_OTP_AVAILABLE:
     app.register_blueprint(email_otp_blueprint, url_prefix='/api/auth/email')
     print("✅ Blueprint de Email OTP registrado")
 
-# ✅ NUEVO: Registrar blueprint de Password Recovery - SIN PREFIX (ya lo tiene en el blueprint)
+# ✅ Registrar blueprint de Password Recovery
 if PASSWORD_RECOVERY_AVAILABLE:
     app.register_blueprint(password_recovery_bp)
     print("✅ Blueprint de Password Recovery registrado en /api/auth/password-recovery/*")
@@ -112,16 +139,13 @@ def register():
         if user_repo.user_exists(email):
             return jsonify({'error': 'User already exists'}), 400
         
-        # ✅ Validación para Email OTP (no requiere phone_number)
         if auth_method == 'sms' and not phone_number:
             return jsonify({'error': 'Phone number is required for SMS authentication'}), 400
         
-        # ✅ Manejar registro para Email OTP
         if auth_method == 'email':
             if not EMAIL_OTP_AVAILABLE:
                 return jsonify({'error': 'Email OTP service is not available'}), 500
                 
-            # Guardar usuario para Email OTP (sin phone_number)
             user_data = {
                 'email': email,
                 'password': password,
@@ -134,7 +158,6 @@ def register():
             user_repo.create_user(user_data)
             print(f"✅ Usuario Email OTP guardado en MongoDB: {email}")
             
-            # Enviar OTP por email inmediatamente después del registro
             from email_otp.application.email_otp_usecases import EmailOTPUseCases
             email_otp_usecases = EmailOTPUseCases()
             email_result = email_otp_usecases.send_otp(email)
@@ -160,7 +183,6 @@ def register():
                     'email': email
                 }), 200
         
-        # Manejar SMS (existente - SIN CAMBIOS)
         elif auth_method == 'sms':
             user_data = {
                 'email': email,
@@ -175,7 +197,6 @@ def register():
             user_repo.create_user(user_data)
             print(f"✅ Usuario SMS guardado en MongoDB: {email}")
             
-            # Enviar OTP INMEDIATAMENTE
             print(f"📤 ENVIANDO OTP a: {phone_number}")
             otp_sent = send_otp_use_case.execute(phone_number)
             
@@ -197,7 +218,7 @@ def register():
                 print("❌ Falló el envío de OTP")
                 return jsonify({'error': 'Failed to send OTP'}), 500
         
-        else:  # TOTP (existente - SIN CAMBIOS)
+        else:  # TOTP
             try:
                 uri = totp_register_usecase.execute(email, password, first_name)
                 session['email'] = email
@@ -233,7 +254,6 @@ def login():
         if not email or not password:
             return jsonify({'error': 'Email and password are required'}), 400
         
-        # BUSCAR EN MONGODB
         user = user_repo.find_by_email(email)
         
         if not user:
@@ -246,7 +266,6 @@ def login():
         
         print(f"✅ Credenciales válidas para: {email}, método: {auth_method}")
         
-        # ✅ Manejar login para Email OTP
         if auth_method == 'email':
             if not EMAIL_OTP_AVAILABLE:
                 return jsonify({'error': 'Email OTP service is not available'}), 500
@@ -272,7 +291,6 @@ def login():
                 print("❌ Falló el envío de OTP por email")
                 return jsonify({'error': 'Failed to send OTP email'}), 500
         
-        # Manejar SMS (existente - SIN CAMBIOS)
         elif auth_method == 'sms':
             phone_number = user.get('phone_number')
             if not phone_number:
@@ -298,7 +316,7 @@ def login():
                 print("❌ Falló el envío de OTP")
                 return jsonify({'error': 'Failed to send OTP'}), 500
         
-        else:  # TOTP (existente - SIN CAMBIOS)
+        else:  # TOTP
             requires_otp = bool(user.get('secret'))
             
             if not requires_otp:
@@ -483,7 +501,6 @@ def home():
         }
         available_services.append("email")
     
-    # ✅ NUEVO: Agregar endpoints de Password Recovery
     if PASSWORD_RECOVERY_AVAILABLE:
         endpoints["password_recovery"] = {
             "request": "POST /api/auth/password-recovery/request",
@@ -494,9 +511,10 @@ def home():
     
     return jsonify({
         "message": "Sistema de Autenticación Unificado",
-        "version": "2.1",
+        "version": "2.2",
         "available_services": available_services,
-        "endpoints": endpoints
+        "endpoints": endpoints,
+        "cors_enabled": True
     })
 
 # ✅ HEALTH CHECK - ACTUALIZADO
@@ -511,8 +529,9 @@ def health():
     return jsonify({
         "status": "healthy",
         "services": services,
-        "port": 5000,
-        "mongodb": "connected"
+        "port": int(os.environ.get('PORT', 5000)),
+        "mongodb": "connected",
+        "cors": "enabled"
     })
 
 # ✅ USER INFO GENERAL (existente - SIN CAMBIOS)
@@ -545,7 +564,7 @@ if __name__ == '__main__':
     print("=" * 60)
     print("🚀 Servidor de Autenticación Unificado iniciado")
     print("=" * 60)
-    print("📡 http://localhost:5000")
+    print(f"📡 http://localhost:{os.environ.get('PORT', 5000)}")
     print("🔐 Servicios disponibles:")
     print("   ✅ SMS OTP: /api/auth/sms/*")
     print("   ✅ TOTP: /api/auth/totp/*") 
@@ -554,11 +573,12 @@ if __name__ == '__main__':
     if PASSWORD_RECOVERY_AVAILABLE:
         print("   ✅ Password Recovery: /api/auth/password-recovery/*")
     print("   ✅ Auth: /api/auth/register, /api/auth/login, etc.")
+    print("🌐 CORS habilitado para Vercel y localhost")
     print("=" * 60)
     
     port = int(os.environ.get('PORT', 5000))
     app.run(
-        debug=True, 
+        debug=os.environ.get('FLASK_ENV') == 'development',
         host='0.0.0.0', 
         port=port,
         use_reloader=False
