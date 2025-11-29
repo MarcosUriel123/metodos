@@ -1,13 +1,20 @@
 from flask import Blueprint, request, jsonify
-from ....shared.database.mongo_connection import MongoDB
-from ....shared.models.user_model import User
-from ....email_otp.infrastructure.brevo_email_adapter import BrevoEmailAdapter
-from ...application.password_recovery_usecases import (
+import sys
+import os
+
+# 🔧 SOLUCIÓN DE IMPORTACIONES - SIN AFECTAR FUNCIONALIDAD
+current_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(0, current_dir)
+
+from shared.database.mongo_connection import MongoDB
+from shared.models.user_model import User
+from email_otp.infrastructure.brevo_email_adapter import BrevoEmailAdapter
+from password_recovery.application.password_recovery_usecases import (
     RequestPasswordRecoveryUseCase,
     VerifyRecoveryOTPUseCase,
     ResetPasswordUseCase
 )
-from ...infrastructure.password_recovery_repository import PasswordRecoveryRepository
+from password_recovery.infrastructure.password_recovery_repository import PasswordRecoveryRepository
 
 # Configuración del Blueprint
 password_recovery_bp = Blueprint('password_recovery', __name__)

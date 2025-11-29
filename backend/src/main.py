@@ -553,7 +553,7 @@ if __name__ == '__main__':
             "http://localhost:*",
             "http://127.0.0.1:*", 
             "https://*.vercel.app",
-            "https://*-yourusername.vercel.app"
+            "https://metodos-two.vercel.app"
         ]
 )
 
