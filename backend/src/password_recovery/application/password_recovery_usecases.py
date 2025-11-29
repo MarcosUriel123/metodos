@@ -45,49 +45,9 @@ class RequestPasswordRecoveryUseCase:
                     'error': 'Error al guardar la solicitud de recuperación'
                 }
             
-            # 4. Enviar email con el código OTP
-            email_subject = "Código de Recuperación - SecureAuth"
-            email_body = f"""
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <style>
-                    body {{ font-family: Arial, sans-serif; }}
-                    .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-                    .header {{ background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }}
-                    .content {{ background: #f7fafc; padding: 30px; border-radius: 0 0 10px 10px; }}
-                    .otp-code {{ font-size: 32px; font-weight: bold; text-align: center; color: #667eea; margin: 20px 0; }}
-                    .warning {{ color: #e53e3e; font-size: 14px; }}
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <div class="header">
-                        <h1>🔐 SecureAuth</h1>
-                        <h2>Recuperación de Contraseña</h2>
-                    </div>
-                    <div class="content">
-                        <p>Hola <strong>{user.get('first_name', 'Usuario')}</strong>,</p>
-                        <p>Has solicitado restablecer tu contraseña. Usa el siguiente código para continuar:</p>
-                        
-                        <div class="otp-code">{otp}</div>
-                        
-                        <p class="warning">⚠️ Este código expirará en 10 minutos</p>
-                        <p>Si no solicitaste este cambio, puedes ignorar este mensaje.</p>
-                        
-                        <br>
-                        <p>Saludos,<br>El equipo de SecureAuth</p>
-                    </div>
-                </div>
-            </body>
-            </html>
-            """
-            
-            email_sent = self.email_adapter.send_email(
-                to_email=email,
-                subject=email_subject,
-                html_content=email_body
-            )
+            # 4. ✅ USAR EL MÉTODO EXISTENTE send_otp_email()
+            print(f"📤 Enviando OTP de recuperación por email a: {email}")
+            email_sent = self.email_adapter.send_otp_email(email, otp)
             
             if not email_sent:
                 print(f"❌ Error al enviar email a: {email}")
@@ -105,6 +65,8 @@ class RequestPasswordRecoveryUseCase:
             
         except Exception as e:
             print(f"❌ Error en RequestPasswordRecoveryUseCase: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return {
                 'success': False,
                 'error': 'Error interno del servidor'
@@ -150,6 +112,8 @@ class VerifyRecoveryOTPUseCase:
             
         except Exception as e:
             print(f"❌ Error en VerifyRecoveryOTPUseCase: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return {
                 'success': False,
                 'error': 'Error interno del servidor'
@@ -169,10 +133,13 @@ class ResetPasswordUseCase:
             # 1. Verificar que la solicitud de recuperación sea válida
             recovery_request = self.password_recovery_repo.find_verified_recovery_request(email, otp)
             if not recovery_request:
-                return {
-                    'success': False,
-                    'error': 'Solicitud de recuperación inválida o expirada'
-                }
+                # Si no está verificada, buscar si es válida aunque no esté marcada como verificada
+                recovery_request = self.password_recovery_repo.find_active_recovery_request(email, otp)
+                if not recovery_request:
+                    return {
+                        'success': False,
+                        'error': 'Solicitud de recuperación inválida o expirada'
+                    }
             
             # 2. Verificar que el código no haya expirado
             if recovery_request['expires_at'] < datetime.now():
@@ -202,6 +169,8 @@ class ResetPasswordUseCase:
             
         except Exception as e:
             print(f"❌ Error en ResetPasswordUseCase: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return {
                 'success': False,
                 'error': 'Error interno del servidor'
