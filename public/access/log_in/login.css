@@ -388,3 +388,28 @@ body::before {
     color: var(--accent-color);
     font-weight: 600;
 }
+
+/* Enlace de recuperación de contraseña */
+.recovery-link {
+    text-align: center;
+    margin: 15px 0 25px 0;
+}
+
+.recovery-link a {
+    color: #667eea;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.3s ease;
+}
+
+.recovery-link a:hover {
+    color: #764ba2;
+    text-decoration: underline;
+}
+
+.recovery-link i {
+    font-size: 0.8rem;
+}
