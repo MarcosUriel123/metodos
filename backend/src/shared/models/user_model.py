@@ -17,19 +17,36 @@ class UserRepository:
     
     def _sanitize_input(self, text):
         """
-        Sanitiza input para prevenir XSS - MANTENIENDO TU LÓGICA ORIGINAL
+        Sanitización CORREGIDA - ahora SÍ bloquea onloadxss, scriptalertXSSscript, etc.
         """
         if not text:
             return text
         
         print(f"🧹 ANTES de sanitizar: '{text}'")
         
-        # ✅ DETECCIÓN DE javascript: ANTES de escapar (MEJORA CRÍTICA)
+        # ✅ DETECCIÓN DE PATRONES PELIGROSOS (CORREGIDO Y MEJORADO)
         critical_patterns = [
-            r'javascript\s*:',  # ¡ESTO FALTABA! Bloquea javascript:
+            r'javascript\s*:',  # Bloquea javascript:
             r'data\s*:',        # Bloquea data URLs
             r'vbscript\s*:',    # Bloquea VBScript
-            r'on\w+\s*=',       # Bloquea event handlers
+            r'on\w+\s*=',       # Bloquea event handlers con =
+            
+            # ✅ NUEVO: Detectar palabras peligrosas en CUALQUIER parte (no solo word boundaries)
+            r'script',          # Bloquea scriptalertXSSscript, onloadxss, etc.
+            r'alert',
+            r'eval',
+            r'expression',
+            r'onload',
+            r'onerror', 
+            r'onclick',
+            r'oninput',
+            r'onmouseover',
+            r'onchange',
+            r'onsubmit',
+            r'onkeydown',
+            r'onkeyup',
+            r'onfocus',
+            r'onblur',
         ]
         
         text_lower = text.lower()
@@ -38,17 +55,16 @@ class UserRepository:
                 print(f"🚫 PATRÓN PELIGROSO DETECTADO: {pattern}")
                 return "***BLOCKED***"
         
-        # ✅ TU LÓGICA ORIGINAL (SE MANTIENE IGUAL)
-        # PASO 1: Escapar caracteres HTML primero
-        text = html.escape(text)
-        
-        # PASO 2: Detectar patrones sospechosos 
+        # ✅ DETECCIÓN DE MÚLTIPLES PALABRAS PELIGROSAS (tu lógica original mejorada)
         suspicious_pattern = r'(script|javascript|alert|eval|onload|onerror|onclick|oninput){2,}'
         if re.search(suspicious_pattern, text, flags=re.IGNORECASE):
             print(f"⚠️ PATRÓN SOSPECHOSO DETECTADO: Múltiples palabras peligrosas juntas")
             return "***BLOCKED***"
         
-        # PASO 3: Bloquear palabras peligrosas completas (con word boundaries)
+        # ✅ ESCAPE HTML (tu lógica original - SE MANTIENE)
+        text = html.escape(text)
+        
+        # ✅ BLOQUEAR PALABRAS PELIGROSAS COMPLETAS (tu lógica original - SE MANTIENE)
         dangerous_words = [
             'script', 'javascript', 'alert', 'eval', 
             'onload', 'onerror', 'onclick', 'oninput', 'onmouseover',
