@@ -17,22 +17,32 @@ class UserRepository:
     
     def _sanitize_input(self, text):
         """
-        Sanitización CORREGIDA - ahora SÍ bloquea onloadxss, scriptalertXSSscript, etc.
+        Sanitización CORREGIDA - ahora SÍ bloquea atributos HTML peligrosos
         """
         if not text:
             return text
         
         print(f"🧹 ANTES de sanitizar: '{text}'")
         
-        # ✅ DETECCIÓN DE PATRONES PELIGROSOS (CORREGIDO Y MEJORADO)
+        # ✅ DETECCIÓN DE PATRONES PELIGROSOS (MEJORADO)
         critical_patterns = [
-            r'javascript\s*:',  # Bloquea javascript:
-            r'data\s*:',        # Bloquea data URLs
-            r'vbscript\s*:',    # Bloquea VBScript
-            r'on\w+\s*=',       # Bloquea event handlers con =
+            # Patrones de ejecución
+            r'javascript\s*:',  
+            r'data\s*:',
+            r'vbscript\s*:',
+            r'on\w+\s*=',
             
-            # ✅ NUEVO: Detectar palabras peligrosas en CUALQUIER parte (no solo word boundaries)
-            r'script',          # Bloquea scriptalertXSSscript, onloadxss, etc.
+            # ✅ NUEVO: Atributos HTML peligrosos
+            r'\bhref\b',           # Bloquea href
+            r'\bsrc\b',            # Bloquea src  
+            r'\baction\b',         # Bloquea action
+            r'\bformaction\b',     # Bloquea formaction
+            r'\bposter\b',         # Bloquea poster
+            r'\bbackground\b',     # Bloquea background
+            r'\bstyle\b',          # Bloquea style (puede contener expression())
+            
+            # Palabras peligrosas en cualquier parte
+            r'script',
             r'alert',
             r'eval',
             r'expression',
@@ -47,6 +57,14 @@ class UserRepository:
             r'onkeyup',
             r'onfocus',
             r'onblur',
+            r'onmouseenter',
+            r'onmouseleave',
+            r'ondblclick',
+            r'oncontextmenu',
+            r'onpointerenter',
+            r'onauxclick',
+            r'onbeforeinput',
+            r'oncompositionend',
         ]
         
         text_lower = text.lower()
@@ -55,8 +73,8 @@ class UserRepository:
                 print(f"🚫 PATRÓN PELIGROSO DETECTADO: {pattern}")
                 return "***BLOCKED***"
         
-        # ✅ DETECCIÓN DE MÚLTIPLES PALABRAS PELIGROSAS (tu lógica original mejorada)
-        suspicious_pattern = r'(script|javascript|alert|eval|onload|onerror|onclick|oninput){2,}'
+        # ✅ DETECCIÓN DE MÚLTIPLES PALABRAS PELIGROSAS
+        suspicious_pattern = r'(script|javascript|alert|eval|onload|onerror|onclick|oninput|href|src|action){2,}'
         if re.search(suspicious_pattern, text, flags=re.IGNORECASE):
             print(f"⚠️ PATRÓN SOSPECHOSO DETECTADO: Múltiples palabras peligrosas juntas")
             return "***BLOCKED***"
@@ -70,7 +88,9 @@ class UserRepository:
             'onload', 'onerror', 'onclick', 'oninput', 'onmouseover',
             'onchange', 'onsubmit', 'onkeydown', 'onkeyup', 'onfocus',
             'onblur', 'onmouseout', 'onmousemove', 'onmouseenter',
-            'onmouseleave', 'ondblclick', 'oncontextmenu'
+            'onmouseleave', 'ondblclick', 'oncontextmenu',
+            # ✅ NUEVO: Atributos HTML peligrosos como palabras completas
+            'href', 'src', 'action', 'formaction', 'poster', 'background', 'style'
         ]
         
         for word in dangerous_words:
