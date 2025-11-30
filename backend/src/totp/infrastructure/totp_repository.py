@@ -16,46 +16,67 @@ class TOTPRepository(UserRepositoryPort):
         return hashed_password.decode('utf-8')
     
     def _sanitize_input(self, text):
-        """Sanitiza input para prevenir XSS - SIN RE-SANITIZACIÓN"""
+        """Sanitiza input para prevenir XSS"""
         if not text:
             return text
         
-        # ✅ REEMPLAZO SIMULTÁNEO (evita bucles)
-        patterns_to_replace = {
-            r'\bscript\b': '***',
-            r'\bjavascript\b': '***', 
-            r'\balert\b': '***',
-            r'\beval\b': '***',
-            r'\bonload\b': '***',
-            r'\bonerror\b': '***',
-            r'\bonclick\b': '***'
+        print(f"🧹 TOTP - ANTES de sanitizar: '{text}'")
+        
+        # ✅ Escapar caracteres HTML PRIMERO
+        text = html.escape(text)
+        
+        # ✅ Bloquear palabras peligrosas
+        dangerous_patterns = {
+            r'script': '***',
+            r'javascript': '***', 
+            r'alert': '***',
+            r'eval': '***',
+            r'onload': '***',
+            r'onerror': '***',
+            r'onclick': '***',
+            r'oninput': '***',
+            r'onmouseover': '***'
         }
         
-        for pattern, replacement in patterns_to_replace.items():
+        for pattern, replacement in dangerous_patterns.items():
             text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
         
-        # ✅ ESCAPAR CARACTERES HTML
-        sanitized_text = html.escape(text).strip()
+        text = text.strip()
         
-        return sanitized_text
+        print(f"🧹 TOTP - DESPUÉS de sanitizar: '{text}'")
+        
+        return text
     
     def save_user(self, email, secret, password, first_name, auth_method="totp"):
-        # ✅ SANITIZAR first_name
+        print("=" * 60)
+        print("🔐 TOTP REPOSITORY - SAVE_USER")
+        print(f"   Email: {email}")
+        print(f"   First Name (ORIGINAL): {first_name}")
+        print("=" * 60)
+        
+        # ✅ SANITIZAR first_name - FORZADO
         sanitized_first_name = self._sanitize_input(first_name)
         
         # ✅ CIFRAR CONTRASEÑA ANTES DE GUARDAR
         hashed_password = self._hash_password(password)
         
-        print(f"🔐 TOTP - Usuario sanitizado: {sanitized_first_name}")
+        print(f"✅ First Name sanitizado: '{first_name}' → '{sanitized_first_name}'")
+        print(f"🔐 Contraseña cifrada: {password[:3]}... → {hashed_password[:20]}...")
+        print("=" * 60)
         
-        return self.users.insert_one({
+        result = self.users.insert_one({
             "email": email,
-            "password": hashed_password,  # ✅ CONTRASEÑA CIFRADA
-            "first_name": sanitized_first_name,  # ✅ NOMBRE SANITIZADO
+            "password": hashed_password,
+            "first_name": sanitized_first_name,
             "secret": secret,
             "auth_method": auth_method,
             "phone_number": None
         })
+        
+        print(f"✅ TOTP User creado con ID: {result.inserted_id}")
+        print("=" * 60)
+        
+        return result
     
     def get_secret_by_email(self, email):
         user = self.users.find_one({"email": email})
@@ -64,7 +85,7 @@ class TOTPRepository(UserRepositoryPort):
     def find_user_by_email(self, email):
         user = self.users.find_one({"email": email})
         
-        # ✅ MIGRACIÓN AUTOMÁTICA (igual que UserRepository)
+        # ✅ MIGRACIÓN AUTOMÁTICA
         if user and 'password' in user:
             current_password = user['password']
             if not current_password.startswith('$2'):

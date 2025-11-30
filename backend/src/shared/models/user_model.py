@@ -15,28 +15,36 @@ class UserRepository:
         return hashed_password.decode('utf-8')
     
     def _sanitize_input(self, text):
-        """Sanitiza input para prevenir XSS - SIN RE-SANITIZACIÓN"""
+        """Sanitiza input para prevenir XSS"""
         if not text:
             return text
         
-        # ✅ REEMPLAZO SIMULTÁNEO (evita bucles)
-        patterns_to_replace = {
-            r'\bscript\b': '***',
-            r'\bjavascript\b': '***', 
-            r'\balert\b': '***',
-            r'\beval\b': '***',
-            r'\bonload\b': '***',
-            r'\bonerror\b': '***',
-            r'\bonclick\b': '***'
+        print(f"🧹 ANTES de sanitizar: '{text}'")
+        
+        # ✅ Escapar caracteres HTML PRIMERO
+        text = html.escape(text)
+        
+        # ✅ Bloquear palabras peligrosas
+        dangerous_patterns = {
+            r'script': '***',
+            r'javascript': '***', 
+            r'alert': '***',
+            r'eval': '***',
+            r'onload': '***',
+            r'onerror': '***',
+            r'onclick': '***',
+            r'oninput': '***',
+            r'onmouseover': '***'
         }
         
-        for pattern, replacement in patterns_to_replace.items():
+        for pattern, replacement in dangerous_patterns.items():
             text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
         
-        # ✅ ESCAPAR CARACTERES HTML
-        sanitized_text = html.escape(text).strip()
+        text = text.strip()
         
-        return sanitized_text
+        print(f"🧹 DESPUÉS de sanitizar: '{text}'")
+        
+        return text
     
     def _check_password(self, plain_password, hashed_password):
         """Verifica si la contraseña coincide con el hash"""
@@ -51,19 +59,42 @@ class UserRepository:
             return False
     
     def create_user(self, user_data):
-        """Crea usuario SANITIZANDO y cifrando automáticamente la contraseña"""
-        # ✅ SANITIZAR CAMPOS DE TEXTO
+        """Crea usuario SANITIZANDO y cifrando automáticamente"""
+        print("=" * 60)
+        print("🔐 CREATE_USER - Inicio")
+        print(f"   Email: {user_data.get('email')}")
+        print(f"   First Name (ORIGINAL): {user_data.get('first_name')}")
+        print(f"   Last Name (ORIGINAL): {user_data.get('last_name')}")
+        print("=" * 60)
+        
+        # ✅ SANITIZAR CAMPOS DE TEXTO - FORZADO
         if 'first_name' in user_data:
+            original = user_data['first_name']
             user_data['first_name'] = self._sanitize_input(user_data['first_name'])
+            print(f"✅ First Name: '{original}' → '{user_data['first_name']}'")
+        
         if 'last_name' in user_data:
+            original = user_data['last_name']
             user_data['last_name'] = self._sanitize_input(user_data['last_name'])
+            print(f"✅ Last Name: '{original}' → '{user_data['last_name']}'")
         
         # ✅ CIFRAR CONTRASEÑA AL REGISTRAR
         if 'password' in user_data:
+            original_password = user_data['password']
             user_data['password'] = self._hash_password(user_data['password'])
-            print(f"🔐 Contraseña cifrada para nuevo usuario: {user_data['email']}")
+            print(f"🔐 Contraseña cifrada para: {user_data['email']}")
+            print(f"   Original: {original_password[:3]}...")
+            print(f"   Hash: {user_data['password'][:20]}...")
         
-        return self.users.insert_one(user_data)
+        print("=" * 60)
+        print("💾 Guardando en MongoDB...")
+        
+        result = self.users.insert_one(user_data)
+        
+        print(f"✅ Usuario creado con ID: {result.inserted_id}")
+        print("=" * 60)
+        
+        return result
     
     def find_by_email(self, email):
         user = self.users.find_one({"email": email})
@@ -79,29 +110,41 @@ class UserRepository:
                     {"email": email},
                     {"$set": {"password": hashed_password}}
                 )
-                # Actualizamos el usuario en memoria
                 user['password'] = hashed_password
         
         return user
     
     def find_by_phone(self, phone):
-        return self.users.find_one({"phone": phone})
+        return self.users.find_one({"phone_number": phone})
     
     def user_exists(self, email):
         return self.users.find_one({"email": email}) is not None
     
     def update_user(self, email, update_data):
-        """Actualiza usuario, SANITIZANDO y cifrando automáticamente la contraseña si está presente"""
+        """Actualiza usuario, SANITIZANDO y cifrando automáticamente"""
+        print("=" * 60)
+        print("🔄 UPDATE_USER - Inicio")
+        print(f"   Email: {email}")
+        print("=" * 60)
+        
         # ✅ SANITIZAR CAMPOS DE TEXTO
         if 'first_name' in update_data:
+            original = update_data['first_name']
             update_data['first_name'] = self._sanitize_input(update_data['first_name'])
+            print(f"✅ First Name: '{original}' → '{update_data['first_name']}'")
+        
         if 'last_name' in update_data:
+            original = update_data['last_name']
             update_data['last_name'] = self._sanitize_input(update_data['last_name'])
+            print(f"✅ Last Name: '{original}' → '{update_data['last_name']}'")
         
         # ✅ CIFRAR CONTRASEÑA SI SE ACTUALIZA
         if 'password' in update_data:
+            original_password = update_data['password']
             update_data['password'] = self._hash_password(update_data['password'])
-            print(f"🔐 Contraseña cifrada en actualización para: {email}")
+            print(f"🔐 Contraseña cifrada en actualización")
+        
+        print("=" * 60)
         
         return self.users.update_one(
             {"email": email},
@@ -109,7 +152,7 @@ class UserRepository:
         )
     
     def verify_password_for_login(self, email, plain_password):
-        """Método especial para verificar contraseñas en el login SIN afectar main.py"""
+        """Método especial para verificar contraseñas en el login"""
         user = self.find_by_email(email)
         if not user or 'password' not in user:
             return False
@@ -120,5 +163,5 @@ class UserRepository:
         if hashed_password.startswith('$2b$') or hashed_password.startswith('$2a$'):
             return self._check_password(plain_password, hashed_password)
         else:
-            # Si es texto plano (compatibilidad)
+            # Si es texto plano (compatibilidad temporal)
             return plain_password == hashed_password
