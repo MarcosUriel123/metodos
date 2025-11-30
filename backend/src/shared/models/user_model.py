@@ -15,30 +15,42 @@ class UserRepository:
         return hashed_password.decode('utf-8')
     
     def _sanitize_input(self, text):
-        """Sanitiza input para prevenir XSS"""
+        """
+        Sanitiza input para prevenir XSS
+        - Bloquea palabras peligrosas completas (con word boundaries)
+        - Detecta patrones sospechosos (múltiples palabras peligrosas juntas)
+        - Escapa caracteres HTML
+        """
         if not text:
             return text
         
         print(f"🧹 ANTES de sanitizar: '{text}'")
         
-        # ✅ Escapar caracteres HTML PRIMERO
+        # ✅ PASO 1: Escapar caracteres HTML primero
         text = html.escape(text)
         
-        # ✅ Bloquear palabras peligrosas
-        dangerous_patterns = {
-            r'script': '***',
-            r'javascript': '***', 
-            r'alert': '***',
-            r'eval': '***',
-            r'onload': '***',
-            r'onerror': '***',
-            r'onclick': '***',
-            r'oninput': '***',
-            r'onmouseover': '***'
-        }
+        # ✅ PASO 2: Detectar patrones sospechosos ANTES de procesar
+        # Si hay múltiples palabras peligrosas pegadas sin espacios
+        suspicious_pattern = r'(script|javascript|alert|eval|onload|onerror|onclick|oninput){2,}'
+        if re.search(suspicious_pattern, text, flags=re.IGNORECASE):
+            print(f"⚠️ PATRÓN SOSPECHOSO DETECTADO: Múltiples palabras peligrosas juntas")
+            print(f"🚫 Input rechazado completamente")
+            return "***BLOCKED***"
         
-        for pattern, replacement in dangerous_patterns.items():
-            text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
+        # ✅ PASO 3: Bloquear palabras peligrosas completas (con word boundaries)
+        # Esto permite "prescription" pero bloquea "script"
+        dangerous_words = [
+            'script', 'javascript', 'alert', 'eval', 
+            'onload', 'onerror', 'onclick', 'oninput', 'onmouseover',
+            'onchange', 'onsubmit', 'onkeydown', 'onkeyup', 'onfocus',
+            'onblur', 'onmouseout', 'onmousemove', 'onmouseenter',
+            'onmouseleave', 'ondblclick', 'oncontextmenu'
+        ]
+        
+        for word in dangerous_words:
+            # \b = word boundary (inicio/fin de palabra)
+            pattern = r'\b' + re.escape(word) + r'\b'
+            text = re.sub(pattern, '***', text, flags=re.IGNORECASE)
         
         text = text.strip()
         
@@ -67,7 +79,7 @@ class UserRepository:
         print(f"   Last Name (ORIGINAL): {user_data.get('last_name')}")
         print("=" * 60)
         
-        # ✅ SANITIZAR CAMPOS DE TEXTO - FORZADO
+        # ✅ SANITIZAR CAMPOS DE TEXTO
         if 'first_name' in user_data:
             original = user_data['first_name']
             user_data['first_name'] = self._sanitize_input(user_data['first_name'])
